@@ -1,6 +1,7 @@
 import { DocumentService } from '../services/document.service';
 import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { MatPaginator, MatSort, MatTableDataSource } from '@angular/material';
+import { Observable } from 'rxjs';
 
 
 export enum KEY_CODE {
@@ -41,13 +42,20 @@ export class TableComponent implements OnInit {
   }
   displayedColumns: string[] = ['state', 'size', 'name', 'creator name', 'type'];
   dataSource = new MatTableDataSource<ListOfDocuments>(ELEMENT);
-
+  
+  getData(){
+    this.documentService.getDocuments().subscribe(
+      result =>{
+        var a=result;
+      }
+     );
+    
+  }
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
   @HostListener('window:keyup', ['$event'])
-  keyEvent(event: KeyboardEvent) {
-    console.log(event);
+  keyEvent(event: KeyboardEvent) {    
     if (event.keyCode === KEY_CODE.ENTER) {
       this.messageShow();
     }
@@ -57,12 +65,12 @@ export class TableComponent implements OnInit {
   }
 
 
+
   ngOnInit() {
     this.documentService.getDocuments().subscribe(
-      result => {
-        const s = result;
-
-      }
+     result =>{
+       var a=result;
+     }
     );
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
