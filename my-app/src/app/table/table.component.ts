@@ -2,34 +2,12 @@ import { DocumentService } from '../services/document.service';
 import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { MatPaginator, MatSort, MatTableDataSource } from '@angular/material';
 import { Observable } from 'rxjs';
+import { Document } from '../models/document';
 
 
 export enum KEY_CODE {
   ENTER = 13
 }
-const ELEMENT: ListOfDocuments[] = [
-  { size: 134, name: 'Math rules', creatorName: 'Olena', type: 'txt' },
-  { size: 2234, name: 'Programming', creatorName: 'Andrew', type: 'txt' },
-  { size: 32, name: 'CV', creatorName: 'Oleg', type: 'txt' },
-  { size: 432, name: 'Rules', creatorName: 'Vitalii', type: 'txt' },
-  { size: 522, name: 'Law', creatorName: 'Solomia', type: 'txt' },
-  { size: 6223, name: 'CV2', creatorName: 'Sofia', type: 'pdf' },
-  { size: 722, name: 'Nitrogen', creatorName: 'Taras', type: 'txt' },
-  { size: 821, name: 'Oxygen', creatorName: 'Ivan', type: 'txt' },
-  { size: 921, name: 'Fluorine', creatorName: 'Jon', type: 'txt' },
-  { size: 10123, name: 'Neon', creatorName: 'Petro', type: 'pdf' },
-  { size: 111, name: 'Sodium', creatorName: 'Vadym', type: 'pdf' },
-  { size: 121, name: 'Magnesium', creatorName: 'Oleg', type: 'txt' },
-  { size: 1313, name: 'Aluminum', creatorName: 'Ivan', type: 'txt' },
-  { size: 142, name: 'Silicon', creatorName: 'Ivan', type: 'txt' },
-  { size: 151, name: 'Phosphorus', creatorName: 'Oleg', type: 'txt' },
-  { size: 161, name: 'Sulfur', creatorName: 'Orest', type: 'txt' },
-  { size: 172, name: 'Chlorine', creatorName: 'Oleg', type: 'pdf' },
-  { size: 181, name: 'Argon', creatorName: 'Ivan', type: 'pdf' },
-  { size: 191, name: 'Potassium', creatorName: 'Yulia', type: 'txt' },
-  { size: 205, name: 'Calcium', creatorName: 'Oleg', type: 'pdf' },
-];
-
 
 @Component({
   selector: 'app-table',
@@ -40,22 +18,27 @@ export class TableComponent implements OnInit {
 
   constructor(private documentService: DocumentService) {
   }
-  displayedColumns: string[] = ['state', 'size', 'name', 'creator name', 'type'];
+  displayedColumns: string[] = ['State', 'Type', 'Description', 'Name', 'Author', 'CreateDate', 'ModifiedDate'];
   dataSource = new MatTableDataSource<ListOfDocuments>(ELEMENT);
-  
-  getData(){
+
+  documents: Document[];//= [{Id:12, Author: 'asss', CreateDate : null, Description: 'sdasd', Name:'asdasdasd',ModDate: null}];
+  getData() {
+
     this.documentService.getDocuments().subscribe(
-      result =>{
-        var a=result;
-      }
-     );
-    
+      results => {
+      this.documents = results
+        console.log(this.documents);
+        console.log(this.dataSource1);
+      });
   }
+  dataSource1 = new MatTableDataSource<Document>(this.documents);
+
+
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
   @HostListener('window:keyup', ['$event'])
-  keyEvent(event: KeyboardEvent) {    
+  keyEvent(event: KeyboardEvent) {
     if (event.keyCode === KEY_CODE.ENTER) {
       this.messageShow();
     }
@@ -64,14 +47,10 @@ export class TableComponent implements OnInit {
     alert('Hot key worked');
   }
 
-
-
   ngOnInit() {
     this.documentService.getDocuments().subscribe(
-     result =>{
-       var a=result;
-     }
-    );
+      results => this.documents = results);
+
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
@@ -79,8 +58,36 @@ export class TableComponent implements OnInit {
 
 
 export interface ListOfDocuments {
-  name: string;
-  size: number;
-  creatorName: string;
-  type: string;
+  Name: string;
+  Author: string;
+  Description: string;
+  Type: string;
+  CreateDate: string;
+  ModifiedDate: string;
 }
+
+const ELEMENT: ListOfDocuments[] = [
+  { Description: 'Math rules', Name: 'Math rules', Author: 'Olena', Type: 'txt', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Programming', Author: 'Andrew', Type: 'txt', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'CV', Author: 'Oleg', Type: 'txt', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Rules', Author: 'Vitalii', Type: 'txt', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Law', Author: 'Solomia', Type: 'txt', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'CV2', Author: 'Sofia', Type: 'pdf', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Nitrogen', Author: 'Taras', Type: 'txt', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Oxygen', Author: 'Ivan', Type: 'txt', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Fluorine', Author: 'Jon', Type: 'txt', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Neon', Author: 'Petro', Type: 'pdf', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Sodium', Author: 'Vadym', Type: 'pdf', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Magnesium', Author: 'Oleg', Type: 'txt', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Aluminum', Author: 'Ivan', Type: 'txt', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Silicon', Author: 'Ivan', Type: 'txt', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Phosphorus', Author: 'Oleg', Type: 'txt', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Sulfur', Author: 'Orest', Type: 'txt', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Chlorine', Author: 'Oleg', Type: 'pdf', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Argon', Author: 'Ivan', Type: 'pdf', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Potassium', Author: 'Yulia', Type: 'txt', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" },
+  { Description: 'Math rules', Name: 'Calcium', Author: 'Oleg', Type: 'pdf', CreateDate: "02/01/2012", ModifiedDate: "02/01/2012" }
+];
+
+
+

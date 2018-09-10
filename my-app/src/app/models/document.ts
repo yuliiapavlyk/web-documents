@@ -3,6 +3,7 @@ export class Document {
     Name: string;
     Description: string;
     Author: string;
+    Type:string;
     CreateDate: Date;
-    ModDate: Date;
+    ModifiedDate: Date;
 }
