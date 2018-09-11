@@ -17,7 +17,7 @@ export class DocumentService {
   private httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
-  private url = `${environment.apiUrl}allDocuments`;
+  private url = `${environment.apiUrl}`;
 
   getDocuments(): Observable<Document[]> {
     return this.http.get<Document[]>(this.url).pipe(

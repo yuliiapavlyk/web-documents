@@ -28,11 +28,8 @@ export class TableComponent implements OnInit {
       results => {
       this.documents = results
         console.log(this.documents);
-        console.log(this.dataSource1);
       });
   }
-  dataSource1 = new MatTableDataSource<Document>(this.documents);
-
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -53,6 +50,10 @@ export class TableComponent implements OnInit {
 
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+  }
+
+  ngOnDestroy(){
+
   }
 }
 
