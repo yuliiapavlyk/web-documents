@@ -13,11 +13,13 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSortModule } from '@angular/material/sort';
 
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { NavComponent } from './nav/nav.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    TableComponent
+    TableComponent,
+    NavComponent
   ],
   imports: [
     BrowserModule,

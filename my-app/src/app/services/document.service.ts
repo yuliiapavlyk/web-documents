@@ -17,11 +17,28 @@ export class DocumentService {
   private httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
-  private url = `${environment.apiUrl}`;
+  private url = `${environment.apiUrl}document`;
 
   getDocuments(): Observable<Document[]> {
     return this.http.get<Document[]>(this.url).pipe(
       catchError(this.handleError<Document[]>(`allDocuments`))
+    );
+  }
+
+  getDocumentById(id: number): Observable<Document[]> {
+    return this.http.get<Document[]>(`${this.url}/${id}`).pipe(
+      catchError(this.handleError<Document[]>(`getDocumentById`))
+    );
+  }
+  updateUser(document: Document): Observable<HttpResponse<any>> {
+    return this.http.put(`${this.url}/${document.Id}`, document, { observe: 'response' }).pipe(
+      catchError(r => of(r))
+    );
+  }
+
+  deleteDocumentById(id: number) {
+    return this.http.delete(`${this.url}/${id}`).pipe(
+      catchError(this.handleError<Document>('deleteDocument'))
     );
   }
 
