@@ -27,6 +27,7 @@ import { NavComponent } from './nav/nav.component';
     MatButtonModule, MatCheckboxModule,
     MatTableModule,
     MatPaginatorModule,
+    MatSortModule,
     MatToolbarModule, MatSortModule,
     HttpModule,
     HttpClientModule

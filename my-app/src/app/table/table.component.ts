@@ -1,10 +1,11 @@
 import { DocumentService } from '../services/document.service';
-import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener, OnDestroy } from '@angular/core';
 import { MatPaginator, MatSort, MatTableDataSource } from '@angular/material';
 import { Observable } from 'rxjs';
 import { Document } from '../models/document';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { Response } from '@angular/http';
 
 
 
@@ -17,23 +18,45 @@ export enum KEY_CODE {
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.css']
 })
-export class TableComponent implements OnInit {
+export class TableComponent implements OnInit ,OnDestroy {
 
   private ngUnsubscribe = new Subject();
+  id=7;
 
   constructor(private documentService: DocumentService) {
+    this.checkbox = false;
   }
-  displayedColumns: string[] = ['State', 'Type', 'Description', 'Name', 'Author', 'CreateDate', 'ModifiedDate'];
-  
-  documents: Document[];//= [{Id:12, Author: 'asss', CreateDate : null, Description: 'sdasd', Name:'asdasdasd',ModDate: null}];
-  dataSource = new MatTableDataSource<Document>(this.documents);
-  getData() {
 
-    this.documentService.getDocuments().subscribe(
-      results => {
-      this.documents = results
-        console.log(this.documents);
-      });
+  displayedColumns: string[] = ['State', 'Name', 'Type','Description','Author', 'CreateDate', 'ModifiedDate'];
+  newDocument: Document;
+  documents: Document[];
+  checkbox:boolean;
+  dataSource = new MatTableDataSource<Document>(this.documents);
+
+  addNewDocument() {
+    this.documentService.createDocument(this.newDocument)
+      .pipe(
+        takeUntil(this.ngUnsubscribe)
+      )
+      .subscribe(
+        results => {
+          this.documents = results
+          console.log(this.documents);
+        }
+
+      );
+
+  }
+
+  deleteDocument(){
+    this.documentService.deleteDocumentById(this.id)
+    .pipe(
+      takeUntil(this.ngUnsubscribe)
+     )
+     .subscribe(
+      results => 
+      this.dataSource.data=results      
+   );    
   }
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -51,20 +74,24 @@ export class TableComponent implements OnInit {
 
   ngOnInit() {
     this.documentService.getDocuments()
-    .pipe(
-      takeUntil(this.ngUnsubscribe)
-     )
-    .subscribe(
-      results => {
-        this.dataSource = new MatTableDataSource(results)    
-      });      
+      .pipe(
+        takeUntil(this.ngUnsubscribe)
+      )
+     
+      .subscribe(
+        results => {
+          this.dataSource.data = results
+        }
+      
+      );
 
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
 
-  ngOnDestroy(){
-
+  ngOnDestroy() {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 }
 

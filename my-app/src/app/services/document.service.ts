@@ -15,14 +15,18 @@ export class DocumentService {
   constructor(private http: HttpClient) { }
 
   private httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    headers: new HttpHeaders({ 'Content-Type': 'application/json',
+    observe: 'response'
+   })
   };
+  
   private url = `${environment.apiUrl}document`;
-
+  
   getDocuments(): Observable<Document[]> {
-    return this.http.get<Document[]>(this.url).pipe(
-      catchError(this.handleError<Document[]>(`allDocuments`))
-    );
+    return this.http.get<Document[]>(this.url)
+    .pipe(catchError(this.handleError<Document[]>(`allDocuments`))
+    )
+   
   }
 
   getDocumentById(id: number): Observable<Document[]> {
@@ -30,14 +34,20 @@ export class DocumentService {
       catchError(this.handleError<Document[]>(`getDocumentById`))
     );
   }
+
+  createDocument(document: Document): Observable<any> {    
+    return this.http.post<Document>(this.url, document, this.httpOptions).pipe(
+      catchError(this.handleError<Document>(`creating plan`)));
+  }
+
   updateUser(document: Document): Observable<HttpResponse<any>> {
-    return this.http.put(`${this.url}/${document.Id}`, document, { observe: 'response' }).pipe(
+    return this.http.put(`${this.url}/${document.Id}`, document, this.httpOptions).pipe(
       catchError(r => of(r))
     );
   }
 
-  deleteDocumentById(id: number) {
-    return this.http.delete(`${this.url}/${id}`).pipe(
+  deleteDocumentById(id: number): Observable<any>{
+    return this.http.delete<Document>(`${this.url}/${id}`).pipe(
       catchError(this.handleError<Document>('deleteDocument'))
     );
   }
