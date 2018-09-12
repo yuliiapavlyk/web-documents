@@ -5,6 +5,7 @@ import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import {Document} from '../models/document';
+import {map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -23,9 +24,8 @@ export class DocumentService {
   private url = `${environment.apiUrl}document`;
   
   getDocuments(): Observable<Document[]> {
-    return this.http.get<Document[]>(this.url)
-    .pipe(catchError(this.handleError<Document[]>(`allDocuments`))
-    )
+    return this.http.get<Document[]>(this.url).pipe(
+      catchError(this.handleError<Document[]>(`getAllDocuments`)))   
    
   }
 

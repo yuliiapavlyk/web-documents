@@ -27,25 +27,29 @@ export class TableComponent implements OnInit ,OnDestroy {
     this.checkbox = false;
   }
 
-  displayedColumns: string[] = ['State', 'Name', 'Type','Description','Author', 'CreateDate', 'ModifiedDate'];
+  displayedColumns: string[] = ['Name','Description','Author', 'CreateDate', 'ModifiedDate'];
   newDocument: Document;
   documents: Document[];
   checkbox:boolean;
   dataSource = new MatTableDataSource<Document>(this.documents);
 
   addNewDocument() {
-    this.documentService.createDocument(this.newDocument)
-      .pipe(
-        takeUntil(this.ngUnsubscribe)
-      )
-      .subscribe(
-        results => {
-          this.documents = results
-          console.log(this.documents);
-        }
+    // this.documentService.createDocument(this.newDocument)
+    //   .pipe(
+    //     takeUntil(this.ngUnsubscribe)
+    //   )
+    //   .subscribe(
+    //     results => {
+    //       this.documents = results
+    //       console.log(this.documents);
+    //     }
 
-      );
-
+    //   );
+    
+    var date = new Date(Date.UTC(2012, 11, 12, 3, 0, 0));
+    console.log(date.toLocaleString());
+    alert(date.toLocaleString(window.navigator.language));
+     
   }
 
   deleteDocument(){
@@ -76,8 +80,7 @@ export class TableComponent implements OnInit ,OnDestroy {
     this.documentService.getDocuments()
       .pipe(
         takeUntil(this.ngUnsubscribe)
-      )
-     
+      )     
       .subscribe(
         results => {
           this.dataSource.data = results
@@ -87,6 +90,7 @@ export class TableComponent implements OnInit ,OnDestroy {
 
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+   
   }
 
   ngOnDestroy() {
