@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
-
-import { environment } from '.././../environments/environment';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import {Document} from '../models/document';
-import {map} from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
+
+import { Document } from '../models/document';
+import { environment } from '.././../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -16,17 +15,17 @@ export class DocumentService {
   constructor(private http: HttpClient) { }
 
   private httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json',
-    observe: 'response'
-   })
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json',
+      observe: 'response'
+    })
   };
-  
+
   private url = `${environment.apiUrl}document`;
-  
+
   getDocuments(): Observable<Document[]> {
     return this.http.get<Document[]>(this.url).pipe(
-      catchError(this.handleError<Document[]>(`getAllDocuments`)))   
-   
+      catchError(this.handleError<Document[]>(`getAllDocuments`)));
   }
 
   getDocumentById(id: number): Observable<Document[]> {
@@ -35,9 +34,9 @@ export class DocumentService {
     );
   }
 
-  createDocument(document: Document): Observable<any> {    
-    return this.http.post<Document>(this.url, document, this.httpOptions).pipe(
-      catchError(this.handleError<Document>(`creating plan`)));
+  createDocument(document: Document): Observable<any> {
+    return this.http.post<Document>(this.url, document, { observe: 'response' }).pipe(
+      catchError(val => of(val)));
   }
 
   updateUser(document: Document): Observable<HttpResponse<any>> {
@@ -46,7 +45,7 @@ export class DocumentService {
     );
   }
 
-  deleteDocumentById(id: number): Observable<any>{
+  deleteDocumentById(id: number): Observable<any> {
     return this.http.delete<Document>(`${this.url}/${id}`).pipe(
       catchError(this.handleError<Document>('deleteDocument'))
     );

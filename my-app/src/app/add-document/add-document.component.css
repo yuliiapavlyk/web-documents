@@ -1,0 +1,17 @@
+.add-document{
+display: flex;
+flex-direction: column;
+}
+.add-document-fileds{
+width: 250px;
+}
+.text-header{
+    text-align: center;
+    font-weight: 500;
+    margin-bottom: 5%;
+}
+.addSuccessfully{
+    text-align: center;
+    font-weight: 200;
+    margin-top: 5%;
+}

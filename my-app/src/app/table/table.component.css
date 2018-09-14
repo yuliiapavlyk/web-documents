@@ -6,25 +6,8 @@ table{
     justify-content: flex-end ;    
 }
 
-
 td,th {
-    width: 30%;
+    width: 25%;
 }
-.fixed{
-    width: 200px !important
-    }
 
-  .table {
-    overflow-x:scroll;
-      }
-
-  .headcol1 {
-    top: 0;
-    position: sticky;
-    z-index: 1;
-    background-color: inherit;
-      }
-      .example-container {
-        height: 400px;
-        overflow: auto;
-      }
+  

@@ -1,0 +1,29 @@
+
+<div class="add-document">
+<div class="text-header">Enter data for creating document</div>
+<mat-form-field class="add-document-fileds">
+  <input matInput placeholder="File name"[(ngModel)]="name" required minlength="1" >
+</mat-form-field>
+
+ <mat-form-field class="add-document-fileds">
+  <mat-select placeholder="Type " [(ngModel)]="valueType">
+    <mat-option *ngFor="let type of types" [value]="type.valueType"  >
+      {{type.valueType}}
+    </mat-option>
+  </mat-select>
+</mat-form-field> 
+
+<mat-form-field class="add-document-fileds">
+  <textarea  matInput placeholder="Description"[(ngModel)]="description" required minlength="1"></textarea>
+</mat-form-field>
+
+<mat-form-field class="add-document-fileds">
+  <input matInput placeholder="Author"[(ngModel)]="author" required minlength="1" >
+</mat-form-field>
+
+
+<button mat-raised-button color="primary" (click)='addDocument()'>Add document</button>
+
+<div *ngIf="addSuccessfully" class="addSuccessfully">You successfully created document</div>
+
+</div>
