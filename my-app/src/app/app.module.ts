@@ -10,6 +10,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import {MatInputModule} from '@angular/material/input';
 import {MatDialogModule} from '@angular/material/dialog';
+import { NgForm} from '@angular/forms';
 
 
 import { AppComponent } from './app.component';
@@ -27,7 +28,8 @@ import {MatSelectModule} from '@angular/material/select';
     TableComponent,
     NavComponent,
     LocalizedDatePipe,
-    AddDocumentComponent
+    AddDocumentComponent,
+  
   ],
   imports: [
     BrowserModule,
