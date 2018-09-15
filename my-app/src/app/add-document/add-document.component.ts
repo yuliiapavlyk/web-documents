@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ResponseOptions } from '@angular/http';
 import { NgForm } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 import { DocumentService } from '../services/document.service';
 import { Document } from '../models/document';
@@ -14,7 +15,7 @@ export interface Type {
   templateUrl: './add-document.component.html',
   styleUrls: ['./add-document.component.css']
 })
-export class AddDocumentComponent implements OnInit {
+export class AddDocumentComponent implements OnInit, OnDestroy {
 
   constructor(private documentService: DocumentService) { }
 
@@ -24,7 +25,8 @@ export class AddDocumentComponent implements OnInit {
   description = '';
   valueType = '';
   name = '';
-  id: number;
+  id: number;  
+  subscription: Subscription;
 
   types: Type[] = [
     { valueType: 'txt' },
@@ -37,7 +39,7 @@ export class AddDocumentComponent implements OnInit {
     const newDocument = {
       Name: this.name, Description: this.description, Type: this.valueType, Author: this.author
     };
-    this.documentService.createDocument(newDocument as Document).subscribe(
+    const subscription = this.documentService.createDocument(newDocument as Document).subscribe(
       resp => {
         if (resp.status === 200) {
           this.addSuccessfully = true;
@@ -50,6 +52,10 @@ export class AddDocumentComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+  
+  ngOnDestroy(){
+    this.subscription.unsubscribe();
   }
 
 }

@@ -2,7 +2,7 @@ import { Component, Inject, OnInit, ViewChild, HostListener, OnDestroy } from '@
 import { MatPaginator, MatSort, MatTableDataSource } from '@angular/material';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Response } from '@angular/http';
-import { Observable, Subject,of } from 'rxjs';
+import { Observable, Subject, of } from 'rxjs';
 import { Subscription } from 'rxjs';
 
 import { Document } from '../models/document';
@@ -21,12 +21,12 @@ export enum keyCode {
 })
 export class TableComponent implements OnInit, OnDestroy {
 
-
   displayedColumns: string[] = ['Name', 'Description', 'Author', 'CreateDate', 'ModifiedDate'];
   documents: Document[];
   dataSource = new MatTableDataSource<Document>(this.documents);
   newDocument: Document;
   subscription: Subscription;
+  subscriptionN: Subscription;
   id: number;
 
   constructor(private documentService: DocumentService,
@@ -37,9 +37,15 @@ export class TableComponent implements OnInit, OnDestroy {
 
     const dialogRef = this.dialog.open(AddDocumentComponent, {
       width: '300px'
+    });    
+   const subscriptionN = dialogRef.afterClosed().subscribe(result => {
+      const subscription = this.documentService.getDocuments()
+      .subscribe(
+        results => {
+          this.dataSource.data = results;
+        }
+      );
     });
-
-
   }
 
   deleteDocument() {
@@ -60,6 +66,7 @@ export class TableComponent implements OnInit, OnDestroy {
       this.messageShow();
     }
   }
+
   messageShow() {
     alert('Hot key works');
   }
@@ -68,18 +75,16 @@ export class TableComponent implements OnInit, OnDestroy {
     const subscription = this.documentService.getDocuments()
       .subscribe(
         results => {
-          this.dataSource.data = results;
+          this.dataSource.data= results;
         }
-
       );
-
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-
   }
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
+    this.subscriptionN.unsubscribe();
   }
 }
 

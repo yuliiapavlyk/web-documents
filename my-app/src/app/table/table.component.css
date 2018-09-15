@@ -5,7 +5,6 @@ table{
     display: flex;
     justify-content: flex-end ;    
 }
-
 td,th {
     width: 25%;
 }
