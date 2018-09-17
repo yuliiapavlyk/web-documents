@@ -3,7 +3,7 @@
   <form #myForm="ngForm" novalidate (ngSubmit)="onSubmit(myForm)">
 
     <mat-form-field class="add-document-fileds">
-      <input matInput placeholder="File name" [(ngModel)]="name" name="nameFile" required pattern="[A-Za-z]{1,}">
+      <input matInput placeholder="File name" [(ngModel)]="name" name="nameFile" required pattern="[A-Za-z0-9]{1,}">
     </mat-form-field>
 
     <mat-form-field class="add-document-fileds">
@@ -15,14 +15,15 @@
     </mat-form-field>
 
     <mat-form-field class="add-document-fileds">
-      <textarea matInput placeholder="Description" [(ngModel)]="description" name="descriptionFile" required pattern="[A-Za-z]{1,}"></textarea>
+      <textarea matInput placeholder="Description" [(ngModel)]="description" name="descriptionFile" required pattern="[A-Za-z0-9]{1,}"></textarea>
     </mat-form-field>
 
     <mat-form-field class="add-document-fileds">
       <input matInput placeholder="Author" [(ngModel)]="author" name="authorFile" required pattern="[A-Za-z]{1,}">
     </mat-form-field>
 
-    <button mat-raised-button color="primary" type="submit" [disabled]="myForm.invalid">Add document</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="myForm.invalid" class="add-document-fileds">Add
+      document</button>
 
     <div *ngIf="addSuccessfully" class="addSuccessfully">You successfully created document</div>
   </form>

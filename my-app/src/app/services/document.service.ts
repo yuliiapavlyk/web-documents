@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 import { Document } from '../models/document';
+import { PagedListDocument } from '../models/pagedListDocument';
 import { environment } from '.././../environments/environment';
 
 @Injectable({
@@ -21,11 +22,15 @@ export class DocumentService {
     })
   };
 
-  private url = `${environment.apiUrl}document`;
+  private url = `${environment.apiUrl}document/`;
 
   getDocuments(): Observable<Document[]> {
     return this.http.get<Document[]>(this.url).pipe(
       catchError(this.handleError<Document[]>(`getAllDocuments`)));
+  }
+  getDocumentsByPage(pageNumber: number, pageSize: number): Observable<PagedListDocument> {
+    return this.http.get<PagedListDocument>(`${environment.apiUrl}document/${pageNumber}/${pageSize}`).pipe(
+      catchError(this.handleError<PagedListDocument>(`getDocumentsByPage`)));
   }
 
   getDocumentById(id: number): Observable<Document[]> {

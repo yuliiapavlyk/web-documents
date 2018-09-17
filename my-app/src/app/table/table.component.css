@@ -9,4 +9,11 @@ td,th {
     width: 25%;
 }
 
-  
+.paginator{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.inputPage{
+    width: 20px;
+}

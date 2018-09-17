@@ -1,15 +1,16 @@
-import { Component, Inject, OnInit, ViewChild, HostListener, OnDestroy } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild, HostListener, OnDestroy, Output, EventEmitter, Input } from '@angular/core';
 import { MatPaginator, MatSort, MatTableDataSource } from '@angular/material';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Response } from '@angular/http';
 import { Observable, Subject, of } from 'rxjs';
 import { Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { PageEvent } from '@angular/material';
 
 import { Document } from '../models/document';
+import { PagedListDocument } from '../models/pagedListDocument';
 import { DocumentService } from '../services/document.service';
 import { AddDocumentComponent } from '../add-document/add-document.component';
-
 
 export enum keyCode {
   enter = 13
@@ -26,9 +27,17 @@ export class TableComponent implements OnInit, OnDestroy {
   documents: Document[];
   dataSource = new MatTableDataSource<Document>(this.documents);
   newDocument: Document;
-  subscription: Subscription;
   id: number;
+  pageNumber = 1;
+  numberOfPages = 1;
+  pageSize = 10;
   private unsubscribe$ = new Subject();
+  listOfPageSize = [
+    { value: 10 },
+    { value: 20 },
+    { value: 30 },
+    { value: 50 }
+  ];
 
   constructor(private documentService: DocumentService,
     public dialog: MatDialog) {
@@ -39,52 +48,56 @@ export class TableComponent implements OnInit, OnDestroy {
       width: '300px'
     });
     dialogRef.afterClosed().subscribe(result => {
-      this.documentService.getDocuments()
+      this.documentService.getDocumentsByPage(this.pageNumber, this.pageSize)
         .pipe(takeUntil(this.unsubscribe$))
         .subscribe(
           results => {
-            this.dataSource.data = results.reverse();
+            this.dataSource.data = results.Items.reverse();
           }
         );
     });
   }
 
-  deleteDocument() {
-
-    // this.documentService.deleteDocumentById(this.id)
-    //   .subscribe(
-    //     results =>
-    //       this.dataSource.data = results
-    //   );
+  updateListOfDocuments() {
+    this.documentService.getDocumentsByPage(this.pageNumber, this.pageSize)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(
+        result => (
+          this.dataSource.data = result.Items.reverse(),
+          this.pageNumber = result.PageNumber,
+          this.numberOfPages = result.NumberOfPages
+        ))
   }
 
+  next() {
+    this.pageNumber++;
+    this.updateListOfDocuments();
+  }
+
+  prev() {
+    this.pageNumber--;
+    this.updateListOfDocuments();
+
+  }
+  getSize(event: any) {
+    this.pageSize = event.target.value;
+    this.updateListOfDocuments();
+  }
+  
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
     if (event.keyCode === keyCode.enter) {
-      this.messageShow();
+      this.addNewDocument();
     }
-  }
-  
-  messageShow() {
-    alert('Hot key works');
   }
 
   ngOnInit() {
-    const subscription = this.documentService.getDocuments()
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(
-        results => {
-          this.dataSource.data = results;
-        }
-
-      );
-
+    this.updateListOfDocuments();
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-
   }
 
   ngOnDestroy() {
