@@ -1,10 +1,12 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ResponseOptions } from '@angular/http';
 import { NgForm } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { DocumentService } from '../services/document.service';
 import { Document } from '../models/document';
+import { pipe } from '@angular/core/src/render3/pipe';
 
 export interface Type {
   valueType: string;
@@ -25,8 +27,8 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
   description = '';
   valueType = '';
   name = '';
-  id: number;  
-  subscription: Subscription;
+  id: number;
+  private unsubscribe$ = new Subject();
 
   types: Type[] = [
     { valueType: 'txt' },
@@ -39,23 +41,26 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
     const newDocument = {
       Name: this.name, Description: this.description, Type: this.valueType, Author: this.author
     };
-    const subscription = this.documentService.createDocument(newDocument as Document).subscribe(
-      resp => {
-        if (resp.status === 200) {
-          this.addSuccessfully = true;
+    this.documentService.createDocument(newDocument as Document)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(
+        resp => {
+          if (resp.status === 200) {
+            this.addSuccessfully = true;
+          }
+          else {
+            this.addSuccessfully = false;
+          }
         }
-        else {
-          this.addSuccessfully = false;
-        }
-      }
-    );
+      );
   }
 
   ngOnInit() {
   }
-  
-  ngOnDestroy(){
-    this.subscription.unsubscribe();
+
+  ngOnDestroy() {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
 }

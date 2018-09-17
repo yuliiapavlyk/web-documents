@@ -4,6 +4,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Response } from '@angular/http';
 import { Observable, Subject, of } from 'rxjs';
 import { Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { Document } from '../models/document';
 import { DocumentService } from '../services/document.service';
@@ -26,25 +27,25 @@ export class TableComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource<Document>(this.documents);
   newDocument: Document;
   subscription: Subscription;
-  subscriptionN: Subscription;
   id: number;
+  private unsubscribe$ = new Subject();
 
   constructor(private documentService: DocumentService,
     public dialog: MatDialog) {
   }
 
   addNewDocument(): void {
-
     const dialogRef = this.dialog.open(AddDocumentComponent, {
       width: '300px'
-    });    
-   const subscriptionN = dialogRef.afterClosed().subscribe(result => {
-      const subscription = this.documentService.getDocuments()
-      .subscribe(
-        results => {
-          this.dataSource.data = results;
-        }
-      );
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      this.documentService.getDocuments()
+        .pipe(takeUntil(this.unsubscribe$))
+        .subscribe(
+          results => {
+            this.dataSource.data = results.reverse();
+          }
+        );
     });
   }
 
@@ -66,25 +67,29 @@ export class TableComponent implements OnInit, OnDestroy {
       this.messageShow();
     }
   }
-
+  
   messageShow() {
     alert('Hot key works');
   }
 
   ngOnInit() {
     const subscription = this.documentService.getDocuments()
+      .pipe(takeUntil(this.unsubscribe$))
       .subscribe(
         results => {
-          this.dataSource.data= results;
+          this.dataSource.data = results;
         }
+
       );
+
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
-    this.subscriptionN.unsubscribe();
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 }
 
