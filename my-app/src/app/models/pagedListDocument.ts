@@ -4,5 +4,7 @@ export class PagedListDocument {
     PageNumber:number;
     Items:Document[];
     PageSize:number;
-    NumberOfPages:number;
+    TotalCount:number;
+    HasPrevious:boolean;
+    HasNext:boolean
 }

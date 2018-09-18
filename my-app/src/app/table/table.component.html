@@ -1,6 +1,6 @@
 <div class="for-buttons">
   <button mat-raised-button (click)="addNewDocument()">Add new</button>
-  <button mat-raised-button (click)="deleteDocument()">Delete</button>
+  <button mat-raised-button (click)="test()">Delete</button>
 </div>
 <div class="table example-container">
   <table mat-table [dataSource]="dataSource" class="sticky" matSort>
@@ -37,16 +37,11 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns; "></tr>
   </table>
 </div>
-<div class="paginator">
-  <select name="items" id="items" (change)="getSize($event)">
-    <option value="10">10</option>
-    <option value="20">20</option>
-    <option value="30">30</option>
-    <option value="40">40</option>
-  </select>
-  <button [disabled]="pageNumber==1" (click)="prev()">
-    <</button> <div>
-        {{pageNumber}}/{{numberOfPages}}</div>
-<button [disabled]="pageNumber==numberOfPages " (click)="next()">></button>
+<mat-paginator *ngIf="paginator" 
+[length]="paginator.TotalCount"
+              [pageSize]="paginator.PageSize"
+              [pageIndex]="paginator.PageNumber"
+              [pageSizeOptions]="pageSizeOptions"
+              (page)="onPageChange($event)">
+</mat-paginator>
 
-</div>

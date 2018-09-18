@@ -10,14 +10,16 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialogModule } from '@angular/material/dialog';
+import { FormsModule } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
 
 import { AppComponent } from './app.component';
 import { TableComponent } from './table/table.component';
 import { NavComponent } from './nav/nav.component';
 import { LocalizedDatePipe } from './pipes/localized-date.pipe';
 import { AddDocumentComponent } from './add-document/add-document.component';
-import { FormsModule } from '@angular/forms';
-import { MatSelectModule } from '@angular/material/select';
+
+
 
 @NgModule({
   declarations: [
@@ -46,7 +48,8 @@ import { MatSelectModule } from '@angular/material/select';
   providers: [
   ],
   entryComponents: [
-    AddDocumentComponent
+    AddDocumentComponent,
+    TableComponent
   ],
   bootstrap: [AppComponent]
 })
