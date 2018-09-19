@@ -49,13 +49,14 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(
         resp => {
-          if (resp.status === 200) {
+          if (resp.status === 201) {
 
             this.addSuccessfully = true;
-            this.dialogRef.close(resp);
+            this.dialogRef.close(resp.body);
           }
           else {
             this.addSuccessfully = false;
+            this.dialogRef.close(null);
           }
         }
       );

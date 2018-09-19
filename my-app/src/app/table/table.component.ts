@@ -4,6 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { PageEvent } from '@angular/material';
+import {Sort} from '@angular/material';
+
 
 import { Document } from '../models/document';
 import { PagedListDocument } from '../models/pagedListDocument';
@@ -23,6 +25,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
   displayedColumns: string[] = ['Name', 'Description', 'Author', 'CreateDate', 'ModifiedDate'];
   documents: Document[];
+  docs = [this.documents];
   paginator: PagedListDocument;
   dataSource = new MatTableDataSource<Document>(this.documents);
   newDocument: number;
@@ -30,8 +33,11 @@ export class TableComponent implements OnInit, OnDestroy {
   lastArgument: any;
   addSuccessfully: boolean;
   addedDocument: Document;
-  lastFunction: (pageSize: number, pageNumber: number) => void;
-
+  pageSize: number = 10;
+  pageNumber: number = 0;
+  activeCriteria: string = 'Id';
+  direction: string = 'asc';
+  IsDialogOpen: boolean;
   private unsubscribe$ = new Subject();
 
   constructor(private documentService: DocumentService,
@@ -40,13 +46,11 @@ export class TableComponent implements OnInit, OnDestroy {
 
   @Input() length = 40;
 
-  @Input() pageIndex = 0;
-
-  @Input() pageSize = 10;
-
-  @Input() pageSizeOptions = [5, 10, 20];
+  @Input() pageSizeOptions = [5, 10, 20, 50];
 
   @Output() page = new EventEmitter<PageEvent>();
+
+  @Output()sortChange = new EventEmitter<Sort>();
 
   addNewDocument(): void {
     const dialogRef = this.dialog.open(AddDocumentComponent, {
@@ -58,62 +62,72 @@ export class TableComponent implements OnInit, OnDestroy {
     );
 
     dialogRef.afterClosed().subscribe(result => {
-      this.addedDocument = result;    
-      this.dataSource.data.unshift(this.addedDocument as Document);       
+      if(result != null){
+      this.addedDocument = result;  
+      let Items= this.dataSource.data;  
+      Items.unshift(this.addedDocument as Document);
+      this.dataSource.data = Items;    
+      }
+      this.IsDialogOpen = !this.IsDialogOpen; 
         
     });
-    // dialogRef.afterClosed().subscribe(result => {
-    //   this.documentService.getDocumentsByPage(this.pageNumber, this.pageSize)
-    //     .pipe(takeUntil(this.unsubscribe$))
-    //     .subscribe(
-    //       results => {                     
-    //       this.paginator=result,
-    //       this.dataSource.data = results.Items;
-    //       }
-    //     );
-    //     this.lastFunction = this.addNewDocument;
-    //     this.lastArgument = null;
-    // });
   }
 
-  updateListOfDocuments(pageSize = 10, pageNumber = 0) {
-    this.documentService.getDocumentsByPage(pageNumber, pageSize)
+  updateListOfDocuments(pageSize: number, pageNumber: number, activeCriteria: string, direction: string): void {
+    this.documentService.getDocumentsByPage(pageNumber, pageSize, activeCriteria, direction)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(
         result => {
           this.paginator = result,
             this.dataSource.data = result.Items;
+            this.docs.push(result.Items);
         }
       )
-    this.lastFunction = this.updateListOfDocuments;
   }
-
-  handlePage(event: PageEvent) {
-    this.page.emit(event);
-
-  }
-
-  @ViewChild(MatSort) sort: MatSort;
 
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
-    if (event.keyCode === keyCode.enter) {
+    if (event.keyCode === keyCode.enter && !this.IsDialogOpen) {
+      this.IsDialogOpen = !this.IsDialogOpen;
       this.addNewDocument();
     }
   }
 
-  onPageChange(event: PageEvent) {
-    if (this.lastFunction != null) {
-      this.lastFunction(event.pageSize, event.pageIndex);
+  onPageChange(event: PageEvent): void {
+    if(event.pageIndex>= 0 && this.pageNumber-1 === event.pageIndex && this.pageSize == event.pageSize){
+      this.dataSource.data= this.docs.pop();
+      this.pageNumber = event.pageIndex;
+      this.pageSize = event.pageSize;
+      debugger
+      return; 
     }
+    if (this.pageSize != event.pageSize){
+      this.pageNumber = 0;
+      this.pageSize = event.pageSize
+      this.docs.length=0;
+      this.updateListOfDocuments(this.pageSize,this.pageNumber,this.activeCriteria,this.direction);
+      return;
+    }
+    this.pageNumber = event.pageIndex;
+    this.pageSize = event.pageSize;
+    debugger
+    this.updateListOfDocuments(this.pageSize,this.pageNumber,this.activeCriteria,this.direction);
   }
 
-  ngOnInit() {
-    this.updateListOfDocuments();
-    this.dataSource.sort = this.sort;
+  onSortChange(event: Sort): void {
+    this.activeCriteria= event.active;
+    this.direction = event.direction? event.direction : 'asc';
+    this.pageNumber = 0;
+    this.docs.length=0;
+    this.updateListOfDocuments(this.pageSize,this.pageNumber,this.activeCriteria,this.direction);
   }
 
-  ngOnDestroy() {
+  ngOnInit(): void {
+    this.updateListOfDocuments(this.pageSize,this.pageNumber,this.activeCriteria,this.direction);
+
+  }
+
+  ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }

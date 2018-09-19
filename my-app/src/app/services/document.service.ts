@@ -9,7 +9,6 @@ import { environment } from '.././../environments/environment';
 
 @Injectable({
   providedIn: 'root'
-
 })
 export class DocumentService {
 
@@ -28,8 +27,8 @@ export class DocumentService {
     return this.http.get<Document[]>(this.url).pipe(
       catchError(this.handleError<Document[]>(`getAllDocuments`)));
   }
-  getDocumentsByPage(pageNumber: number, pageSize: number): Observable<PagedListDocument> {
-    return this.http.get<PagedListDocument>(`${environment.apiUrl}document/${pageNumber}/${pageSize}`).pipe(
+  getDocumentsByPage(pageNumber: number, pageSize: number, active: string, direction: string): Observable<PagedListDocument> {
+    return this.http.get<PagedListDocument>(`${environment.apiUrl}document/${pageNumber}/${pageSize}/${active}/${direction}`).pipe(
       catchError(this.handleError<PagedListDocument>(`getDocumentsByPage`)));
   }
 
