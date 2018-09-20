@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 import { Document } from '../models/document';
+import { DocumentParams } from '../models/documentsParams';
 import { PagedListDocument } from '../models/pagedListDocument';
 import { environment } from '.././../environments/environment';
 
@@ -27,8 +28,8 @@ export class DocumentService {
     return this.http.get<Document[]>(this.url).pipe(
       catchError(this.handleError<Document[]>(`getAllDocuments`)));
   }
-  getDocumentsByPage(pageNumber: number, pageSize: number, active: string, direction: string): Observable<PagedListDocument> {
-    return this.http.get<PagedListDocument>(`${environment.apiUrl}document/${pageNumber}/${pageSize}/${active}/${direction}`).pipe(
+  getDocumentsByPage(pageNumber: number, pageSize: number, docParams: DocumentParams): Observable<PagedListDocument> {
+    return this.http.post<PagedListDocument>(`${environment.apiUrl}document/${pageNumber}/${pageSize}`, docParams, this.httpOptions).pipe(
       catchError(this.handleError<PagedListDocument>(`getDocumentsByPage`)));
   }
 

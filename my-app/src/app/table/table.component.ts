@@ -1,13 +1,15 @@
-import { Component, OnInit, ViewChild, HostListener, OnDestroy, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener, OnDestroy, ElementRef, Output, EventEmitter, Input } from '@angular/core';
 import { MatSort, MatTableDataSource } from '@angular/material';
 import { MatDialog } from '@angular/material/dialog';
-import { Subject } from 'rxjs';
+import { Subject, fromEvent } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { PageEvent } from '@angular/material';
-import {Sort} from '@angular/material';
+import { Sort } from '@angular/material';
 
 
 import { Document } from '../models/document';
+import { DocumentParams } from '../models/documentsParams';
 import { PagedListDocument } from '../models/pagedListDocument';
 import { DocumentService } from '../services/document.service';
 import { AddDocumentComponent } from '../add-document/add-document.component';
@@ -30,6 +32,7 @@ export class TableComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource<Document>(this.documents);
   newDocument: number;
   id: number;
+  index: number = 1;
   lastArgument: any;
   addSuccessfully: boolean;
   addedDocument: Document;
@@ -50,7 +53,9 @@ export class TableComponent implements OnInit, OnDestroy {
 
   @Output() page = new EventEmitter<PageEvent>();
 
-  @Output()sortChange = new EventEmitter<Sort>();
+  @Output('matSortChange')sortChange = new EventEmitter<Sort>();
+
+  @ViewChild('input') input: ElementRef;
 
   addNewDocument(): void {
     const dialogRef = this.dialog.open(AddDocumentComponent, {
@@ -73,8 +78,9 @@ export class TableComponent implements OnInit, OnDestroy {
     });
   }
 
-  updateListOfDocuments(pageSize: number, pageNumber: number, activeCriteria: string, direction: string): void {
-    this.documentService.getDocumentsByPage(pageNumber, pageSize, activeCriteria, direction)
+  updateListOfDocuments(pageSize: number, pageNumber: number, search: string, activeCriteria: string, direction: string): void {
+    
+    this.documentService.getDocumentsByPage(pageNumber, pageSize, new DocumentParams( activeCriteria, direction, search))
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(
         result => {
@@ -95,36 +101,64 @@ export class TableComponent implements OnInit, OnDestroy {
 
   onPageChange(event: PageEvent): void {
     if(event.pageIndex>= 0 && this.pageNumber-1 === event.pageIndex && this.pageSize == event.pageSize){
-      this.dataSource.data= this.docs.pop();
+     // debugger
+      // this.docs.pop();
+      // this.dataSource.data= this.docs[this.docs.length-1];
+      this.index++;
+      this.dataSource.data= this.docs[this.docs.length-this.index];
       this.pageNumber = event.pageIndex;
       this.pageSize = event.pageSize;
-      debugger
       return; 
     }
     if (this.pageSize != event.pageSize){
+      this.index = 1;
+
       this.pageNumber = 0;
       this.pageSize = event.pageSize
       this.docs.length=0;
-      this.updateListOfDocuments(this.pageSize,this.pageNumber,this.activeCriteria,this.direction);
+      this.LoadDocuments();
       return;
     }
+    if(this.index > 1){
+      this.index--;
+      this.dataSource.data= this.docs[this.docs.length-this.index];
+      this.pageNumber = event.pageIndex;
+      this.pageSize = event.pageSize;
+      return; 
+    }
+
     this.pageNumber = event.pageIndex;
     this.pageSize = event.pageSize;
-    debugger
-    this.updateListOfDocuments(this.pageSize,this.pageNumber,this.activeCriteria,this.direction);
+    this.LoadDocuments();
   }
 
   onSortChange(event: Sort): void {
     this.activeCriteria= event.active;
     this.direction = event.direction? event.direction : 'asc';
     this.pageNumber = 0;
+    this.index = 1;
     this.docs.length=0;
-    this.updateListOfDocuments(this.pageSize,this.pageNumber,this.activeCriteria,this.direction);
+    this.LoadDocuments();
   }
 
   ngOnInit(): void {
-    this.updateListOfDocuments(this.pageSize,this.pageNumber,this.activeCriteria,this.direction);
+    this.updateListOfDocuments(this.pageSize,this.pageNumber,'',this.activeCriteria,this.direction);
+    fromEvent(this.input.nativeElement,'keyup')
+    .pipe(
+        debounceTime(200),
+        distinctUntilChanged(),
+        tap(() => {
+            this.docs.length=0;
+            this.pageNumber = 0;
+            this.index = 1;
+            this.LoadDocuments();
+        })
+    )
+    .subscribe();
 
+  }
+  LoadDocuments(): void{
+this.updateListOfDocuments(this.pageSize,this.pageNumber,this.input.nativeElement.value, this.activeCriteria,this.direction);
   }
 
   ngOnDestroy(): void {
