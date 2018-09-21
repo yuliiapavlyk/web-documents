@@ -3,7 +3,15 @@ display: flex;
 flex-direction: column;
 }
 .add-document-fileds{
-width: 250px;
+ width: 250px; 
+
+}
+.for-submit{
+    width:60%; 
+}
+.for-buttons{
+    display: flex;
+    justify-content: space-between;
 }
 .text-header{
     text-align: center;

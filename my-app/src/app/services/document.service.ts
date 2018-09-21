@@ -29,6 +29,7 @@ export class DocumentService {
       catchError(this.handleError<Document[]>(`getAllDocuments`)));
   }
   getDocumentsByPage(pageNumber: number, pageSize: number, docParams: DocumentParams): Observable<PagedListDocument> {
+    console.log('sssssss');
     return this.http.post<PagedListDocument>(`${environment.apiUrl}document/${pageNumber}/${pageSize}`, docParams, this.httpOptions).pipe(
       catchError(this.handleError<PagedListDocument>(`getDocumentsByPage`)));
   }

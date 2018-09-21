@@ -5,7 +5,7 @@ import { Subject, fromEvent } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { PageEvent } from '@angular/material';
-import { Sort } from '@angular/material';
+import { Sort, MatTable } from '@angular/material';
 
 
 import { Document } from '../models/document';
@@ -52,6 +52,8 @@ export class TableComponent implements OnInit, OnDestroy {
   @Input() pageSizeOptions = [5, 10, 20, 50];
 
   @Output() page = new EventEmitter<PageEvent>();
+  
+  @ViewChild(MatTable) table: MatTable<any>;
 
   @Output('matSortChange')sortChange = new EventEmitter<Sort>();
 
@@ -66,12 +68,12 @@ export class TableComponent implements OnInit, OnDestroy {
     }
     );
 
-    dialogRef.afterClosed().subscribe(result => {
-      if(result != null){
+    dialogRef.afterClosed().subscribe( result => {
+      if(result != undefined ){
       this.addedDocument = result;  
-      let Items= this.dataSource.data;  
-      Items.unshift(this.addedDocument as Document);
-      this.dataSource.data = Items;    
+      this.dataSource.data.unshift(this.addedDocument as Document); 
+      this.table.renderRows(); 
+
       }
       this.IsDialogOpen = !this.IsDialogOpen; 
         

@@ -21,10 +21,13 @@
     <mat-form-field class="add-document-fileds">
       <input matInput placeholder="Author" [(ngModel)]="author" name="authorFile" required pattern="[A-Za-z]{1,}">
     </mat-form-field>
-
-    <button mat-raised-button color="primary" type="submit" [disabled]="myForm.invalid" class="add-document-fileds">Add
+    <input type="file" #file style="display: none" (change)="onFilesAdded()" multiple />
+    <div class="for-buttons">
+    <button mat-button [mat-dialog-close]="undefined">Cancel</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="myForm.invalid" class="for-submit" >Add
       document</button>
-
+    
+    </div>
     <div *ngIf="addSuccessfully" class="addSuccessfully">You successfully created document</div>
   </form>
 </div>

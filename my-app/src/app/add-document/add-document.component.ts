@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter, Inject, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -23,6 +23,9 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
     public dialogRef: MatDialogRef<AddDocumentComponent>,
     @Inject(MAT_DIALOG_DATA) public data: Document
   ) { }
+
+  @ViewChild('file') file;
+  public files: Set<File> = new Set();
 
   addSuccessfully: boolean;
   notCreated: boolean;
