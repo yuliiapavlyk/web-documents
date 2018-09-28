@@ -3,7 +3,7 @@ import { NgModule, LOCALE_ID } from '@angular/core';
 import { HttpModule } from '@angular/http';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatButtonModule, MatCheckboxModule } from '@angular/material';
+import { MatButtonModule, MatCheckboxModule, MatSnackBarModule, MatTooltipModule } from '@angular/material';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSortModule } from '@angular/material/sort';
@@ -15,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 
 import { AppComponent } from './app.component';
+import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
 import { TableComponent } from './table/table.component';
 import { NavComponent } from './nav/nav.component';
 import { LocalizedDatePipe } from './pipes/localized-date.pipe';
@@ -26,6 +27,7 @@ import { AddDocumentComponent } from './add-document/add-document.component';
   declarations: [
     AppComponent,
     TableComponent,
+    ConfirmDialogComponent,
     NavComponent,
     LocalizedDatePipe,
     AddDocumentComponent
@@ -44,13 +46,16 @@ import { AddDocumentComponent } from './add-document/add-document.component';
     MatInputModule,
     MatDialogModule,
     FormsModule,
-    MatSelectModule
+    MatSelectModule,
+    MatSnackBarModule,
+    MatTooltipModule
 
   ],
   providers: [
   ],
   entryComponents: [
     AddDocumentComponent,
+    ConfirmDialogComponent,
     TableComponent
   ],
   bootstrap: [AppComponent]

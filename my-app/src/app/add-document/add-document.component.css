@@ -6,13 +6,28 @@ flex-direction: column;
  width: 250px; 
 
 }
+.tooltiplabel{
+    color: grey;
+    font-size: 90%;
+    font-style: italic;
+}
+.add-document-fileds textarea{
+
+ max-height: 350px;
+}
 .for-submit{
     width:60%; 
+}
+.for-upload{
+    width:100%;  
 }
 .for-buttons{
     display: flex;
     justify-content: space-between;
 }
+.fileInput {
+    display: none;
+  }
 .text-header{
     text-align: center;
     font-weight: 500;

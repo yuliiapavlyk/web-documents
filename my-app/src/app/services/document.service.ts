@@ -28,9 +28,8 @@ export class DocumentService {
     return this.http.get<Document[]>(this.url).pipe(
       catchError(this.handleError<Document[]>(`getAllDocuments`)));
   }
-  getDocumentsByPage(pageNumber: number, pageSize: number, docParams: DocumentParams): Observable<PagedListDocument> {
-    console.log('sssssss');
-    return this.http.post<PagedListDocument>(`${environment.apiUrl}document/${pageNumber}/${pageSize}`, docParams, this.httpOptions).pipe(
+  getDocumentsByPage( docParams: DocumentParams): Observable<PagedListDocument> {
+    return this.http.post<PagedListDocument>(`${this.url}getDocuments/`, docParams, this.httpOptions).pipe(
       catchError(this.handleError<PagedListDocument>(`getDocumentsByPage`)));
   }
 
@@ -38,6 +37,11 @@ export class DocumentService {
     return this.http.get<Document[]>(`${this.url}/${id}`).pipe(
       catchError(this.handleError<Document[]>(`getDocumentById`))
     );
+  }
+
+  uploadDocument(file: FormData ): Observable<any> {
+    return this.http.post<any>(`${this.url}upload`, file , { observe: 'response' }).pipe(
+      catchError(val => of(val)));
   }
 
   createDocument(document: Document): Observable<any> {
@@ -54,6 +58,11 @@ export class DocumentService {
   deleteDocumentById(id: number): Observable<any> {
     return this.http.delete<Document>(`${this.url}/${id}`).pipe(
       catchError(this.handleError<Document>('deleteDocument'))
+    );
+  }
+  deleteDocuments(ids: number[]): Observable<any> {
+    return this.http.request<number[]>('delete', this.url, { body:ids} ).pipe(
+      catchError(this.handleError<any>('deleteDocuments'))
     );
   }
 

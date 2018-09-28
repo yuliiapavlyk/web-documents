@@ -2,32 +2,38 @@
   <div class="text-header">Enter data for creating document</div>
   <form #myForm="ngForm" novalidate (ngSubmit)="onSubmit(myForm,$event)">
 
+
+    <!-- <button mat-button type="button" name="uploadbutton" class="for-upload" (click)="file.click()" color="primary">Add
+      File</button> -->
+      <mat-form-field class="for-upload">
+        <mat-select placeholder="Add File" disableRipple  [value]="accept"     (selectionChange)="setAccept($event)" >
+          <mat-option value="" class="fileInput" ></mat-option>
+          <mat-option value=".txt">Text file..</mat-option>
+          <mat-option value=".doc">Microsoft Document 97-2003..</mat-option>
+          <mat-option value=".docx">Microsoft Document</mat-option>
+          <mat-option value=".pdf">PDF file..</mat-option>
+        </mat-select>
+      </mat-form-field>
+
     <mat-form-field class="add-document-fileds">
-      <input matInput placeholder="File name" [(ngModel)]="name" name="nameFile" required pattern="[A-Za-z0-9]{1,}">
+      <input matInput placeholder="File " [(ngModel)]="name" name="nameFile" [disabled]="!addSuccessfully" [readonly]="true">
     </mat-form-field>
 
     <mat-form-field class="add-document-fileds">
-      <mat-select placeholder="Type " [(ngModel)]="valueType" name="typeFile" required>
-        <mat-option *ngFor="let type of types" [value]="type.valueType">
-          {{type.valueType}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field class="add-document-fileds">
-      <textarea matInput placeholder="Description" [(ngModel)]="description" name="descriptionFile" required pattern="[A-Za-z0-9]{1,}"></textarea>
+      <textarea matInput placeholder="Description" maxlength="500" [(ngModel)]="description" name="descriptionFile"
+        required pattern="[A-Za-z0-9]{1,}"></textarea>
     </mat-form-field>
 
     <mat-form-field class="add-document-fileds">
       <input matInput placeholder="Author" [(ngModel)]="author" name="authorFile" required pattern="[A-Za-z]{1,}">
     </mat-form-field>
-    <input type="file" #file style="display: none" (change)="onFilesAdded()" multiple />
+    <input class="fileInput" type="file" [accept]="accept" #file id="file" (change)="onFilesAdded($event)" />
     <div class="for-buttons">
-    <button mat-button [mat-dialog-close]="undefined">Cancel</button>
-    <button mat-raised-button color="primary" type="submit" [disabled]="myForm.invalid" class="for-submit" >Add
-      document</button>
-    
+      <button mat-button [mat-dialog-close]="undefined">Cancel</button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="!(addSuccessfully && !myForm.invalid) " class="for-submit">Add
+        document</button>
+
     </div>
-    <div *ngIf="addSuccessfully" class="addSuccessfully">You successfully created document</div>
+    <div *ngIf="addSuccessfully" class="addSuccessfully">You selected {{name}}</div>
   </form>
 </div>
