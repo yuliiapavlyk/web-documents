@@ -67,6 +67,7 @@ export class TableComponent implements OnInit, OnDestroy {
   @ViewChild('input') input: ElementRef;
 
   addNewDocument(): void {
+    this.IsDialogOpen = true;
     const dialogRef = this.dialog.open(AddDocumentComponent, {
       width: '300px',
       data: {
@@ -103,9 +104,11 @@ export class TableComponent implements OnInit, OnDestroy {
 
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
-    console.log(this.selection.selected);
+    
     if (event.keyCode === keyCode.enter && !this.IsDialogOpen) {
-      this.IsDialogOpen = !this.IsDialogOpen;
+      this.IsDialogOpen = true;
+      console.log(this.selection.selected);
+      
       this.addNewDocument();
     }
   }
@@ -132,6 +135,13 @@ export class TableComponent implements OnInit, OnDestroy {
     }
     this.selection.clear();
     return idsArray;
+  }
+
+  Search(): void {
+    this.docs.length = 0;
+    this.pageNumber = 0;
+    this.index = 1;
+    this.LoadDocuments();
   }
 
   onPageChange(event: PageEvent): void {

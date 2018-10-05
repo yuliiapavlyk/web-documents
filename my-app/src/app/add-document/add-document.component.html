@@ -6,8 +6,8 @@
     <!-- <button mat-button type="button" name="uploadbutton" class="for-upload" (click)="file.click()" color="primary">Add
       File</button> -->
       <mat-form-field class="for-upload">
-        <mat-select placeholder="Add File" disableRipple  [value]="accept"     (selectionChange)="setAccept($event)" >
-          <mat-option value="" class="fileInput" ></mat-option>
+        <mat-select placeholder="Add File" disableRipple (selectionChange)="setAccept($event)" >
+          <mat-option  class="fileInput" >None</mat-option>
           <mat-option value=".txt">Text file..</mat-option>
           <mat-option value=".doc">Microsoft Document 97-2003..</mat-option>
           <mat-option value=".docx">Microsoft Document</mat-option>

@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Output, EventEmitter, Inject, ViewChild, 
 import { NgForm } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatSelect } from '@angular/material';
 import { MatSnackBar } from '@angular/material';
 
 import { DocumentService } from '../services/document.service';
@@ -27,9 +27,9 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
     public dialog: MatDialog
   ) { }
   @ViewChild('file') inputFile: ElementRef;
-
+  @ViewChild(MatSelect) Select: MatSelect;
   public files: Set<File> = new Set();
-  accept: string = 'none';
+  accept: string = 'None';
   addSuccessfully: boolean;
   notCreated: boolean;
   regexp: RegExp = new RegExp('^[^><:"/|?*\]+(.doc|.docx|.pdf|.txt)$');
@@ -74,6 +74,9 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
   onFilesAdded(event): void {
     const selected: File = event.target.files[0];
     if (selected == null) {
+      if(this.formData){
+        return null;
+      }
       this.snackBar.open('You should choose  the file', '', {
         duration: 2000
       });
@@ -101,12 +104,14 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
   setAccept(event) {
     this.inputFile.nativeElement.accept = event.value;
     let element: HTMLElement = this.inputFile.nativeElement as HTMLElement;
-    this.accept = undefined;
+    this.Select.value = this.accept; 
     element.click();
   }
 
   openSnackBar(): void {
-    this.snackBar.open(' Type could be only [txt, pdf, doc, docx] and Name without[><:"/|?*\] ', 'Ok');
+    this.snackBar.open(' Type could be only [txt, pdf, doc, docx] and Name without[><:"/|?*\] ', 'Ok',{
+      duration: 4000
+    });
   }
   ngOnDestroy(): void {
     this.unsubscribe$.next();

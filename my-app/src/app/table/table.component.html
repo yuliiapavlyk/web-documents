@@ -1,10 +1,17 @@
-<div class="for-input">
-  <mat-form-field>
-
-    <input matInput placeholder="Search documents" #input>
-
-  </mat-form-field>
+<div class="search">
+  <div>
+      <mat-form-field >
+          <input  matInput placeholder="Search documents" #input > 
+          <mat-hint>sdasd </mat-hint>
+        </mat-form-field>
+  </div>
+  <div class="buttons" >
+    <button mat-raised-button (click)="Search()">Search..</button>
+  </div>
 </div>
+
+
+
 <div class="for-buttons">
   <button mat-raised-button (click)="addNewDocument()">Add new</button>
   <button mat-raised-button (click)="deleteDocuments()">Delete</button>

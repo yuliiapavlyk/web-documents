@@ -1,10 +1,16 @@
 .for-input{
     display: flex;
+    width: 80%; 
     justify-content: left;   
 }
-
+.search{
+    display: flex ;
+    width: 80%;
+    /* justify-content: space-around; */
+    background: red;
+}
 table{
-    width: 100%
+    width: 100%;
 }
 .for-buttons{       
     display: flex;
@@ -13,12 +19,18 @@ table{
 td,th {
     width: 25%;
 }
-
+.buttons{
+    padding: 5%;
+}
 .paginator{
     display: flex;
     justify-content: flex-end;
 }
 
+.inputSearch{
+    width: 100%;
+
+}
 .inputPage{
     width: 20px;
 }
