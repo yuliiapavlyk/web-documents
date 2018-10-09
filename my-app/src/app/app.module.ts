@@ -3,7 +3,7 @@ import { NgModule, LOCALE_ID } from '@angular/core';
 import { HttpModule } from '@angular/http';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatButtonModule, MatCheckboxModule, MatSnackBarModule, MatTooltipModule } from '@angular/material';
+import { MatButtonModule, MatCheckboxModule, MatSnackBarModule, MatTooltipModule , MatAutocompleteModule,  } from '@angular/material';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSortModule } from '@angular/material/sort';
@@ -11,7 +11,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from'@angular/material';
 import { MatDialogModule } from '@angular/material/dialog';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 
 import { AppComponent } from './app.component';
@@ -37,6 +37,7 @@ import { AddDocumentComponent } from './add-document/add-document.component';
     BrowserAnimationsModule,
     MatButtonModule, MatCheckboxModule,
     MatTableModule,
+    MatAutocompleteModule,
     MatPaginatorModule,
     MatSortModule,
     MatProgressSpinnerModule,
@@ -48,7 +49,8 @@ import { AddDocumentComponent } from './add-document/add-document.component';
     FormsModule,
     MatSelectModule,
     MatSnackBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    ReactiveFormsModule
 
   ],
   providers: [

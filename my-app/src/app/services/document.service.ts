@@ -6,6 +6,7 @@ import { catchError, map } from 'rxjs/operators';
 import { Document } from '../models/document';
 import { DocumentParams } from '../models/documentsParams';
 import { PagedListDocument } from '../models/pagedListDocument';
+import { PagedListDocumentWithMessage } from '../models/pagedListDocumentWithMessage';
 import { environment } from '.././../environments/environment';
 
 @Injectable({
@@ -32,6 +33,11 @@ export class DocumentService {
     return this.http.post<PagedListDocument>(`${this.url}getDocuments/`, docParams, this.httpOptions).pipe(
       catchError(this.handleError<PagedListDocument>(`getDocumentsByPage`)));
   }
+  getDocumentsByPageWithSearch( docParams: DocumentParams): Observable<PagedListDocumentWithMessage> {
+    return this.http.post<PagedListDocumentWithMessage>(`${this.url}search/`, docParams, this.httpOptions).pipe(
+      catchError(this.handleError<PagedListDocumentWithMessage>(`getDocumentsByPage`)));
+  }
+
 
   getDocumentById(id: number): Observable<Document[]> {
     return this.http.get<Document[]>(`${this.url}/${id}`).pipe(

@@ -6,8 +6,8 @@
 .search{
     display: flex ;
     width: 80%;
-    /* justify-content: space-around; */
-    background: red;
+    justify-content: space-around;
+
 }
 table{
     width: 100%;
@@ -20,7 +20,7 @@ td,th {
     width: 25%;
 }
 .buttons{
-    padding: 5%;
+    margin: 1%;
 }
 .paginator{
     display: flex;

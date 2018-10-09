@@ -1,16 +1,15 @@
 <div class="search">
-  <div>
-      <mat-form-field >
-          <input  matInput placeholder="Search documents" #input > 
-          <mat-hint>sdasd </mat-hint>
-        </mat-form-field>
-  </div>
-  <div class="buttons" >
-    <button mat-raised-button (click)="Search()">Search..</button>
-  </div>
+  <mat-form-field style="width: 80%">
+    <input matInput placeholder="Search documents" class="for-input" [formControl]="myControl" #input [matAutocomplete]="auto">
+    <mat-hint>{{hint}} </mat-hint>
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+        {{option}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+  <button class="buttons" mat-raised-button (click)="Search()">Search..</button>
 </div>
-
-
 
 <div class="for-buttons">
   <button mat-raised-button (click)="addNewDocument()">Add new</button>

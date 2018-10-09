@@ -2,12 +2,13 @@ import { Component, OnInit, ViewChild, HostListener, OnDestroy, ElementRef, Outp
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatSort, MatTableDataSource, MatPaginator } from '@angular/material';
 import { MatDialog } from '@angular/material/dialog';
-import { Subject, fromEvent } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject, fromEvent, Observable } from 'rxjs';
+import { takeUntil, startWith, map } from 'rxjs/operators';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { PageEvent } from '@angular/material';
 import { Sort, MatTable } from '@angular/material';
-
+import { FormControl } from '@angular/forms';
+import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 
 import { Document } from '../models/document';
 import { DocumentParams } from '../models/documentsParams';
@@ -27,6 +28,9 @@ export enum keyCode {
 export class TableComponent implements OnInit, OnDestroy {
 
   displayedColumns: string[] = ['Name', 'Description', 'Author', 'CreateDate', 'ModifiedDate'];
+  myControl = new FormControl();
+  filteredOptions: Observable<string[]>;
+  options: string[] = [];
   documents: Document[];
   docs = [this.documents];
   paginator: PagedListDocument;
@@ -37,6 +41,7 @@ export class TableComponent implements OnInit, OnDestroy {
   lastArgument: any;
   addSuccessfully: boolean;
   addedDocument: Document;
+  hint: string;
   pageSize: number = 10;
   pageNumber: number = 0;
   activeCriteria: string = 'Id';
@@ -45,14 +50,13 @@ export class TableComponent implements OnInit, OnDestroy {
   private unsubscribe$ = new Subject();
   selection = new SelectionModel<Document>(true, []);
 
-
+  @ViewChild(MatAutocompleteTrigger) trigger: MatAutocompleteTrigger;
   @ViewChild(MatPaginator) paginator2: MatPaginator;
 
   constructor(private documentService: DocumentService,
     public dialog: MatDialog) {
   }
 
-  //@Input() length = 40;
 
   @Input() length: number;
 
@@ -91,25 +95,29 @@ export class TableComponent implements OnInit, OnDestroy {
 
   updateListOfDocuments(pageSize: number, pageNumber: number, search: string, activeCriteria: string, direction: string): void {
 
-    this.documentService.getDocumentsByPage(new DocumentParams(activeCriteria, direction, search, pageNumber, pageSize))
+    this.documentService.getDocumentsByPageWithSearch(new DocumentParams(activeCriteria, direction, search, pageNumber, pageSize))
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(
         result => {
           this.paginator = result,
-          this.dataSource.data = result.Items;
-          this.docs.push(result.Items);
+            this.dataSource.data = result.Items;
+          if (result.Message != null) {
+            this.hint = 'Showing results for the query: ' + result.Message;
+          }
+          if (result.Items.length <= 0) {
+            this.hint = 'No document found for request ' + result.Message;
+          }
         }
       )
   }
 
+
+
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
-    
-    if (event.keyCode === keyCode.enter && !this.IsDialogOpen) {
-      this.IsDialogOpen = true;
-      console.log(this.selection.selected);
-      
-      this.addNewDocument();
+    if (event.keyCode === keyCode.enter) {
+      this.trigger.closePanel();
+      this.Search();
     }
   }
 
@@ -138,6 +146,23 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   Search(): void {
+
+    let searchvalue: string = this.input.nativeElement.value.replace(/\s+/g, ' ').trim().toLowerCase();
+
+    if (searchvalue.length != 0) {
+      if (this.options.filter(option => option.toLowerCase() === searchvalue).length == 0) {
+        this.options.unshift(searchvalue);
+        this.options.length = 10;
+        localStorage.setItem('searchHistory', JSON.stringify(this.options));
+      }
+      else {
+        let index: number = this.options.findIndex(option => option.toLowerCase() === searchvalue);
+        this.options.splice(index, 1);
+        this.options.unshift(searchvalue);
+      }
+    }
+
+    this.hint = "";
     this.docs.length = 0;
     this.pageNumber = 0;
     this.index = 1;
@@ -145,30 +170,6 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   onPageChange(event: PageEvent): void {
-    if (event.pageIndex >= 0 && this.pageNumber - 1 === event.pageIndex && this.pageSize == event.pageSize) {
-      this.index++;
-      this.dataSource.data = this.docs[this.docs.length - this.index];
-      this.pageNumber = event.pageIndex;
-      this.pageSize = event.pageSize;
-      return;
-    }
-    if (this.pageSize != event.pageSize) {
-      this.index = 1;
-
-      this.pageNumber = 0;
-      this.pageSize = event.pageSize
-      this.docs.length = 0;
-      this.LoadDocuments();
-      return;
-    }
-    if (this.index > 1) {
-      this.index--;
-      this.dataSource.data = this.docs[this.docs.length - this.index];
-      this.pageNumber = event.pageIndex;
-      this.pageSize = event.pageSize;
-      return;
-    }
-
     this.pageNumber = event.pageIndex;
     this.pageSize = event.pageSize;
     this.LoadDocuments();
@@ -185,25 +186,28 @@ export class TableComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.updateListOfDocuments(this.pageSize, this.pageNumber, '', this.activeCriteria, this.direction);
-    fromEvent(this.input.nativeElement, 'keyup')
-      .pipe(
-        debounceTime(200),
-        distinctUntilChanged(),
-        tap(() => {
-          this.docs.length = 0;
-          this.pageNumber = 0;
-          this.index = 1;
-          this.LoadDocuments();
-        })
-      )
-      .subscribe();
+    if (localStorage.getItem('searchHistory') != '') {
+      this.options = JSON.parse(localStorage.getItem('searchHistory'));
+    }
+    this.filteredOptions = this.myControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(value))
+    );
 
   }
+
   LoadDocuments(): void {
     this.updateListOfDocuments(this.pageSize, this.pageNumber, this.input.nativeElement.value, this.activeCriteria, this.direction);
   }
 
+  private _filter(filter: string): string[] {
+    const filterValue = filter.toLowerCase();
+
+    return this.options.filter(option => option.toLowerCase().indexOf(filterValue) === 0);
+  }
+
   ngOnDestroy(): void {
+    localStorage.setItem('searchHistory', JSON.stringify(this.options));
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
