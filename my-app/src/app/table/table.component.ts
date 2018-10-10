@@ -152,7 +152,9 @@ export class TableComponent implements OnInit, OnDestroy {
     if (searchvalue.length != 0) {
       if (this.options.filter(option => option.toLowerCase() === searchvalue).length == 0) {
         this.options.unshift(searchvalue);
-        this.options.length = 10;
+        if (this.options.length > 10) {
+          this.options.length = 10;
+        }
         localStorage.setItem('searchHistory', JSON.stringify(this.options));
       }
       else {
@@ -186,14 +188,14 @@ export class TableComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.updateListOfDocuments(this.pageSize, this.pageNumber, '', this.activeCriteria, this.direction);
-    if (localStorage.getItem('searchHistory') != '') {
+    if (localStorage.getItem('searchHistory') != null) {
       this.options = JSON.parse(localStorage.getItem('searchHistory'));
-    }
-    this.filteredOptions = this.myControl.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(value))
-    );
-
+   
+  }
+  this.filteredOptions = this.myControl.valueChanges.pipe(
+    startWith(''),
+    map(value => this._filter(value))
+  );
   }
 
   LoadDocuments(): void {
@@ -202,7 +204,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
   private _filter(filter: string): string[] {
     const filterValue = filter.toLowerCase();
-
+    if (this.options.length == 0) return null;
     return this.options.filter(option => option.toLowerCase().indexOf(filterValue) === 0);
   }
 
