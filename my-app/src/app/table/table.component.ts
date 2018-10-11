@@ -14,6 +14,7 @@ import { Document } from '../models/document';
 import { DocumentParams } from '../models/documentsParams';
 import { PagedListDocument } from '../models/pagedListDocument';
 import { DocumentService } from '../services/document.service';
+import { HistoryService } from '../services/history.service';
 import { AddDocumentComponent } from '../add-document/add-document.component';
 
 export enum keyCode {
@@ -42,7 +43,7 @@ export class TableComponent implements OnInit, OnDestroy {
   updAuthor: string = "";
   updCreateDate: Date;
   updId: number;
-  updatePossibility:boolean=false;
+  updatePossibility: boolean = false;
   index: number = 1;
   lastArgument: any;
   addSuccessfully: boolean;
@@ -62,6 +63,7 @@ export class TableComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator2: MatPaginator;
 
   constructor(private documentService: DocumentService,
+    private historyService: HistoryService,
     public dialog: MatDialog) {
   }
 
@@ -107,6 +109,13 @@ export class TableComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(
         result => {
+          this.historyService.getSearcHistory().subscribe(
+            respone => {
+              if (respone.length != 0) {
+                this.options = respone.map(i => i.SearchQuery);
+              }
+            }
+          );
           this.paginator = result,
             this.dataSource.data = result.Items;
           if (result.Message != null) {
@@ -121,7 +130,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;    
+    const numRows = this.dataSource.data.length;
     return numSelected === numRows;
   }
 
@@ -133,8 +142,8 @@ export class TableComponent implements OnInit, OnDestroy {
   }
   getDocument(id: number) {
     console.log(this.selection);
-    
-    this.updatePossibility=true;
+
+    this.updatePossibility = true;
     this.documentService.getDocumentById(id).subscribe(res => {
       this.updName = res.Name;
       this.updDescription = res.Description;
@@ -190,21 +199,6 @@ export class TableComponent implements OnInit, OnDestroy {
 
     let searchvalue: string = this.input.nativeElement.value.replace(/\s+/g, ' ').trim().toLowerCase();
 
-    if (searchvalue.length != 0) {
-      if (this.options.filter(option => option.toLowerCase() === searchvalue).length == 0) {
-        this.options.unshift(searchvalue);
-        if (this.options.length > 10) {
-          this.options.length = 10;
-        }
-        localStorage.setItem('searchHistory', JSON.stringify(this.options));
-      }
-      else {
-        let index: number = this.options.findIndex(option => option.toLowerCase() === searchvalue);
-        this.options.splice(index, 1);
-        this.options.unshift(searchvalue);
-      }
-    }
-
     this.hint = "";
     this.docs.length = 0;
     this.pageNumber = 0;
@@ -229,10 +223,14 @@ export class TableComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.updateListOfDocuments(this.pageSize, this.pageNumber, '', this.activeCriteria, this.direction);
-    if (localStorage.getItem('searchHistory') != null) {
-      this.options = JSON.parse(localStorage.getItem('searchHistory'));
+    this.historyService.getSearcHistory().subscribe(
+      respone => {
+        if (respone.length != 0) {
+          this.options = respone.map(i => i.SearchQuery);
+        }
+      }
+    );
 
-    }
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
       map(value => this._filter(value))
@@ -250,7 +248,6 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    localStorage.setItem('searchHistory', JSON.stringify(this.options));
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
