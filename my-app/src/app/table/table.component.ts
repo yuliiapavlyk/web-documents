@@ -222,19 +222,20 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.updateListOfDocuments(this.pageSize, this.pageNumber, '', this.activeCriteria, this.direction);
+    
     this.historyService.getSearcHistory().subscribe(
       respone => {
         if (respone.length != 0) {
           this.options = respone.map(i => i.SearchQuery);
+          this.filteredOptions = this.myControl.valueChanges.pipe(
+            startWith(''),
+            map(value => this._filter(value))
+          );
         }
       }
     );
-
-    this.filteredOptions = this.myControl.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(value))
-    );
+    this.updateListOfDocuments(this.pageSize, this.pageNumber, '', this.activeCriteria, this.direction);
+   
   }
 
   LoadDocuments(): void {
