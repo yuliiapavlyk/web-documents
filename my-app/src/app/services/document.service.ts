@@ -39,9 +39,9 @@ export class DocumentService {
   }
 
 
-  getDocumentById(id: number): Observable<Document[]> {
-    return this.http.get<Document[]>(`${this.url}/${id}`).pipe(
-      catchError(this.handleError<Document[]>(`getDocumentById`))
+  getDocumentById(id: number): Observable<Document> {
+    return this.http.get<Document>(`${this.url}/${id}`).pipe(
+      catchError(this.handleError<Document>(`getDocumentById`))
     );
   }
 
@@ -55,8 +55,8 @@ export class DocumentService {
       catchError(val => of(val)));
   }
 
-  updateUser(document: Document): Observable<HttpResponse<any>> {
-    return this.http.put(`${this.url}/${document.Id}`, document, this.httpOptions).pipe(
+  updateDocument( document: Document): Observable<HttpResponse<any>> {
+    return this.http.put(`${this.url}/${document.Id}`,document, this.httpOptions).pipe(
       catchError(r => of(r))
     );
   }

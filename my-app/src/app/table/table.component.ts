@@ -27,7 +27,7 @@ export enum keyCode {
 })
 export class TableComponent implements OnInit, OnDestroy {
 
-  displayedColumns: string[] = ['Name', 'Description', 'Author', 'CreateDate', 'ModifiedDate'];
+  displayedColumns: string[] = ['Select', 'Name', 'Description', 'Author', 'CreateDate', 'ModifiedDate'];
   myControl = new FormControl();
   filteredOptions: Observable<string[]>;
   options: string[] = [];
@@ -37,6 +37,12 @@ export class TableComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource<Document>(this.documents);
   newDocument: number;
   id: number;
+  updName: string = "";
+  updDescription: string = "";
+  updAuthor: string = "";
+  updCreateDate: Date;
+  updId: number;
+  updatePossibility:boolean=false;
   index: number = 1;
   lastArgument: any;
   addSuccessfully: boolean;
@@ -47,6 +53,8 @@ export class TableComponent implements OnInit, OnDestroy {
   activeCriteria: string = 'Id';
   direction: string = 'asc';
   IsDialogOpen: boolean;
+  idForUpdate: number = 0;
+
   private unsubscribe$ = new Subject();
   selection = new SelectionModel<Document>(true, []);
 
@@ -111,7 +119,41 @@ export class TableComponent implements OnInit, OnDestroy {
       )
   }
 
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.data.length;    
+    return numSelected === numRows;
+  }
 
+  masterToggle() {
+
+    this.isAllSelected() ?
+      this.selection.clear() :
+      this.dataSource.data.forEach(row => this.selection.select(row));
+  }
+  getDocument(id: number) {
+    console.log(this.selection);
+    
+    this.updatePossibility=true;
+    this.documentService.getDocumentById(id).subscribe(res => {
+      this.updName = res.Name;
+      this.updDescription = res.Description;
+      this.updCreateDate = res.CreateDate;
+      this.updAuthor = res.Author;
+      this.updId = res.Id;
+    })
+
+  }
+  updateDocument() {
+    const updDocument = {
+      Id: this.updId, Name: this.updName, Description: this.updDescription, Author: this.updAuthor
+    };
+
+    this.documentService.updateDocument(updDocument as Document).subscribe(res => {
+      this.LoadDocuments();
+    });
+    this.selection.clear();
+  }
 
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
@@ -130,7 +172,6 @@ export class TableComponent implements OnInit, OnDestroy {
         this.docs.length = 0;
         this.LoadDocuments();
       }
-
       );
     }
   }
@@ -190,12 +231,12 @@ export class TableComponent implements OnInit, OnDestroy {
     this.updateListOfDocuments(this.pageSize, this.pageNumber, '', this.activeCriteria, this.direction);
     if (localStorage.getItem('searchHistory') != null) {
       this.options = JSON.parse(localStorage.getItem('searchHistory'));
-   
-  }
-  this.filteredOptions = this.myControl.valueChanges.pipe(
-    startWith(''),
-    map(value => this._filter(value))
-  );
+
+    }
+    this.filteredOptions = this.myControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(value))
+    );
   }
 
   LoadDocuments(): void {
