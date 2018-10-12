@@ -6,7 +6,6 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatSelect } from '@angular/ma
 import { MatSnackBar } from '@angular/material';
 
 import { DocumentService } from '../services/document.service';
-import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog.component';
 import { Document } from '../models/document';
 
 
@@ -74,7 +73,7 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
   onFilesAdded(event): void {
     const selected: File = event.target.files[0];
     if (selected == null) {
-      if(this.formData){
+      if (this.formData) {
         return null;
       }
       this.snackBar.open('You should choose  the file', '', {
@@ -103,13 +102,13 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
 
   setAccept(event) {
     this.inputFile.nativeElement.accept = event.value;
-    let element: HTMLElement = this.inputFile.nativeElement as HTMLElement;
-    this.Select.value = this.accept; 
+    const element: HTMLElement = this.inputFile.nativeElement as HTMLElement;
+    this.Select.value = this.accept;
     element.click();
   }
 
   openSnackBar(): void {
-    this.snackBar.open(' Type could be only [txt, pdf, doc, docx] and Name without[><:"/|?*\] ', 'Ok',{
+    this.snackBar.open(' Type could be only [txt, pdf, doc, docx] and Name without[><:"/|?*\] ', 'Ok', {
       duration: 4000
     });
   }

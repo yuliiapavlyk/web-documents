@@ -16,7 +16,7 @@
 .table{
     width: 75%;
 }
-.update-block{
+#update-block{
     border-left: 1px solid  rgb(240, 241, 241);
 position: fixed;
 float: right;
@@ -52,3 +52,16 @@ td,th {
 .input-field{
     width: 80%;
 }
+.pointer{
+    cursor: grab;
+}
+button{
+    margin-right: 3%
+}
+.hovered {
+    border: dotted 2px gray !important;
+  }
+  .invisible {
+    display: none;
+  }
+  

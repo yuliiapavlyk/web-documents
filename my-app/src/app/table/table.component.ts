@@ -9,6 +9,7 @@ import { PageEvent } from '@angular/material';
 import { Sort, MatTable } from '@angular/material';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatSnackBar } from '@angular/material';
 
 import { Document } from '../models/document';
 import { DocumentParams } from '../models/documentsParams';
@@ -16,8 +17,10 @@ import { PagedListDocument } from '../models/pagedListDocument';
 import { DocumentService } from '../services/document.service';
 import { AddDocumentComponent } from '../add-document/add-document.component';
 
+
 export enum keyCode {
-  enter = 13
+  enter = 13,
+  space = 32
 }
 
 @Component({
@@ -36,13 +39,13 @@ export class TableComponent implements OnInit, OnDestroy {
   paginator: PagedListDocument;
   dataSource = new MatTableDataSource<Document>(this.documents);
   newDocument: number;
-  id: number;
+  dropId: number;
   updName: string = "";
   updDescription: string = "";
   updAuthor: string = "";
   updCreateDate: Date;
   updId: number;
-  updatePossibility:boolean=false;
+  updatePossibility: boolean = false;
   index: number = 1;
   lastArgument: any;
   addSuccessfully: boolean;
@@ -54,15 +57,18 @@ export class TableComponent implements OnInit, OnDestroy {
   direction: string = 'asc';
   IsDialogOpen: boolean;
   idForUpdate: number = 0;
-
+  beforeDocument: Document;
+  dropElement: boolean = false;
   private unsubscribe$ = new Subject();
   selection = new SelectionModel<Document>(true, []);
+
 
   @ViewChild(MatAutocompleteTrigger) trigger: MatAutocompleteTrigger;
   @ViewChild(MatPaginator) paginator2: MatPaginator;
 
   constructor(private documentService: DocumentService,
-    public dialog: MatDialog) {
+    public dialog: MatDialog,
+    public snackBar: MatSnackBar) {
   }
 
 
@@ -77,6 +83,14 @@ export class TableComponent implements OnInit, OnDestroy {
   @Output('matSortChange') sortChange = new EventEmitter<Sort>();
 
   @ViewChild('input') input: ElementRef;
+  @ViewChild('inputUpdate') inputUpdate: ElementRef;
+
+
+  openSnackBar(message: string, action: string): void {
+    this.snackBar.open(message, action, {
+      duration: 2000,
+    });
+  }
 
   addNewDocument(): void {
     this.IsDialogOpen = true;
@@ -87,14 +101,12 @@ export class TableComponent implements OnInit, OnDestroy {
       }
     }
     );
-
     dialogRef.afterClosed().subscribe(result => {
 
-      if (result != undefined) {
+      if (result !== undefined) {
         this.addedDocument = result;
         this.dataSource.data.unshift(this.addedDocument as Document);
         this.dataSource.paginator = this.paginator2;
-        //this.paginator.PageSize = this.paginator.PageSize;
         this.table.renderRows();
       }
       this.IsDialogOpen = !this.IsDialogOpen;
@@ -102,7 +114,6 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   updateListOfDocuments(pageSize: number, pageNumber: number, search: string, activeCriteria: string, direction: string): void {
-
     this.documentService.getDocumentsByPageWithSearch(new DocumentParams(activeCriteria, direction, search, pageNumber, pageSize))
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(
@@ -119,40 +130,75 @@ export class TableComponent implements OnInit, OnDestroy {
       )
   }
 
-  isAllSelected() {
+  allowDrop(ev): void {
+    ev.preventDefault();
+  }
+
+
+  drag(ev, id: any): void {
+
+    ev.dataTransfer.setData("text", ev.target.id);
+    this.dropId = id;
+    document.getElementById("update-block").classList.add("hovered");
+
+  }
+
+  drop(ev): void {
+    document.getElementById("update-block").classList.remove("hovered");
+    ev.preventDefault();
+    this.getDocument(this.dropId);
+    this.dropElement = true;
+
+  }
+
+  isAllSelected(): boolean {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;    
+    const numRows = this.dataSource.data.length;
     return numSelected === numRows;
   }
 
-  masterToggle() {
-
+  masterToggle(): void {
     this.isAllSelected() ?
       this.selection.clear() :
       this.dataSource.data.forEach(row => this.selection.select(row));
   }
-  getDocument(id: number) {
-    console.log(this.selection);
-    
-    this.updatePossibility=true;
-    this.documentService.getDocumentById(id).subscribe(res => {
-      this.updName = res.Name;
-      this.updDescription = res.Description;
-      this.updCreateDate = res.CreateDate;
-      this.updAuthor = res.Author;
-      this.updId = res.Id;
-    })
 
+  getDocument(id: number): void {
+    this.documentService.getDocumentById(id)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(res => {
+        this.updName = res.Name;
+        this.updDescription = res.Description;
+        this.updCreateDate = res.CreateDate;
+        this.updAuthor = res.Author;
+        this.updId = res.Id;
+        this.beforeDocument = res;
+      });
   }
-  updateDocument() {
+
+  updateDocument(): void {
     const updDocument = {
       Id: this.updId, Name: this.updName, Description: this.updDescription, Author: this.updAuthor
     };
-
-    this.documentService.updateDocument(updDocument as Document).subscribe(res => {
-      this.LoadDocuments();
-    });
+    this.documentService.updateDocument(updDocument as Document)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(res => {
+        this.LoadDocuments();
+      });
     this.selection.clear();
+    this.updatePossibility = false;
+
+    this.openSnackBar("Document '" + this.updName + "' was updated", "Ok");
+  }
+
+  cancelUpdate(): void {
+    this.updName = this.beforeDocument.Name;
+    this.updDescription = this.beforeDocument.Description;
+    this.updCreateDate = this.beforeDocument.CreateDate;
+    this.updAuthor = this.beforeDocument.Author;
+    this.updId = this.beforeDocument.Id;
+    this.beforeDocument = this.beforeDocument;
+    this.updatePossibility = false;
   }
 
   @HostListener('window:keyup', ['$event'])
@@ -161,25 +207,30 @@ export class TableComponent implements OnInit, OnDestroy {
       this.trigger.closePanel();
       this.Search();
     }
+    if (event.keyCode === keyCode.space) {
+      console.log(this.selection);
+
+    }
   }
 
   deleteDocuments(): void {
-    if (this.selection.selected.length != 0) {
+    if (this.selection.selected.length !== 0) {
       const array = this.getIdsArray();
-      this.documentService.deleteDocuments(array).subscribe(result => {
-        this.index = 1;
-        this.pageNumber = 0;
-        this.docs.length = 0;
-        this.LoadDocuments();
-      }
-      );
+      this.documentService.deleteDocuments(array)
+        .pipe(takeUntil(this.unsubscribe$))
+        .subscribe(result => {
+          this.index = 1;
+          this.pageNumber = 0;
+          this.docs.length = 0;
+          this.LoadDocuments();
+        }
+        );
     }
   }
 
   getIdsArray(): number[] {
-    let idsArray: number[] = new Array();
-
-    for (let i of this.selection.selected) {
+    const idsArray: number[] = new Array();
+    for (const i of this.selection.selected) {
       idsArray.push(i.Id);
     }
     this.selection.clear();
@@ -187,11 +238,9 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   Search(): void {
-
-    let searchvalue: string = this.input.nativeElement.value.replace(/\s+/g, ' ').trim().toLowerCase();
-
-    if (searchvalue.length != 0) {
-      if (this.options.filter(option => option.toLowerCase() === searchvalue).length == 0) {
+    const searchvalue: string = this.input.nativeElement.value.replace(/\s+/g, ' ').trim().toLowerCase();
+    if (searchvalue.length !== 0) {
+      if (this.options.filter(option => option.toLowerCase() === searchvalue).length === 0) {
         this.options.unshift(searchvalue);
         if (this.options.length > 10) {
           this.options.length = 10;
@@ -199,13 +248,12 @@ export class TableComponent implements OnInit, OnDestroy {
         localStorage.setItem('searchHistory', JSON.stringify(this.options));
       }
       else {
-        let index: number = this.options.findIndex(option => option.toLowerCase() === searchvalue);
+        const index: number = this.options.findIndex(option => option.toLowerCase() === searchvalue);
         this.options.splice(index, 1);
         this.options.unshift(searchvalue);
       }
     }
-
-    this.hint = "";
+    this.hint = '';
     this.docs.length = 0;
     this.pageNumber = 0;
     this.index = 1;
@@ -237,6 +285,17 @@ export class TableComponent implements OnInit, OnDestroy {
       startWith(''),
       map(value => this._filter(value))
     );
+
+    fromEvent(this.inputUpdate.nativeElement, 'keyup')
+      .pipe(
+        debounceTime(200),
+        distinctUntilChanged(),
+        tap(() => {
+          this.updatePossibility = true;
+        })
+      )
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe();
   }
 
   LoadDocuments(): void {
@@ -245,7 +304,9 @@ export class TableComponent implements OnInit, OnDestroy {
 
   private _filter(filter: string): string[] {
     const filterValue = filter.toLowerCase();
-    if (this.options.length == 0) return null;
+    if (this.options.length === 0) {
+      return null;
+    }
     return this.options.filter(option => option.toLowerCase().indexOf(filterValue) === 0);
   }
 
