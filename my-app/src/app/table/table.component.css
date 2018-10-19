@@ -1,3 +1,4 @@
+
 .for-input{
     display: flex;
     width: 80%; 
@@ -11,30 +12,39 @@
 .main-container{
     display: flex;
     flex-flow: row;
+    
  
 }
 .table{
     width: 75%;
 }
 #update-block{
-    border-left: 1px solid  rgb(240, 241, 241);
+border-left: 1px solid  rgb(240, 241, 241);
 position: fixed;
 float: right;
-right: 1px;
-  width: 25%;
-  height: 550px;
-
+right: 0;
+width: 25%;
+height: 80%;
+overflow: auto;
 }
 .data{
     margin: 20%;
+   
 }
 .for-buttons{       
     display: flex;
     justify-content: flex-start ;    
 }
-td,th {
-    width: 20%;
+
+.checkColumn{
+width: 10% ;
 }
+.nameColumn{
+    width: 15% ;
+    }
+    .description{
+        width: 25% ;
+    }
 .buttons{
     margin: 1%;
 }
@@ -61,7 +71,3 @@ button{
 .hovered {
     border: dotted 2px gray !important;
   }
-  .invisible {
-    display: none;
-  }
-  

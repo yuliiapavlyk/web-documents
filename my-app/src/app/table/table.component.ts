@@ -19,8 +19,7 @@ import { AddDocumentComponent } from '../add-document/add-document.component';
 
 
 export enum keyCode {
-  enter = 13,
-  space = 32
+  enter = 13
 }
 
 @Component({
@@ -40,6 +39,7 @@ export class TableComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource<Document>(this.documents);
   newDocument: number;
   dropId: number;
+  updDocument:Document;
   updName: string = "";
   updDescription: string = "";
   updAuthor: string = "";
@@ -55,9 +55,10 @@ export class TableComponent implements OnInit, OnDestroy {
   pageNumber: number = 0;
   activeCriteria: string = 'Id';
   direction: string = 'asc';
+  nameElement: string = "";
   IsDialogOpen: boolean;
   idForUpdate: number = 0;
-  beforeDocument: Document;
+  previousDocument: Document;
   dropElement: boolean = false;
   private unsubscribe$ = new Subject();
   selection = new SelectionModel<Document>(true, []);
@@ -84,7 +85,6 @@ export class TableComponent implements OnInit, OnDestroy {
 
   @ViewChild('input') input: ElementRef;
   @ViewChild('inputUpdate') inputUpdate: ElementRef;
-
 
   openSnackBar(message: string, action: string): void {
     this.snackBar.open(message, action, {
@@ -128,32 +128,45 @@ export class TableComponent implements OnInit, OnDestroy {
           }
         }
       )
-  }
+  }  
 
-  allowDrop(ev): void {
-    ev.preventDefault();
-  }
-
-
-  drag(ev, id: any): void {
-
-    ev.dataTransfer.setData("text", ev.target.id);
-    this.dropId = id;
-    document.getElementById("update-block").classList.add("hovered");
-
-  }
-
-  drop(ev): void {
+  handleDrop(ev): void {
     document.getElementById("update-block").classList.remove("hovered");
     ev.preventDefault();
     this.getDocument(this.dropId);
+   
     this.dropElement = true;
+  }
 
+  handleDragStart(ev, id: number): void {
+    this.dropId = id;
+    ev.target.style.opacity = '0.4';       
+    const img = document.createElement("img");
+    img.src = "http://s1.iconbird.com/ico/0612/GooglePlusInterfaceIcons/w128h1281338911594add.png";
+    ev.dataTransfer.setDragImage(img, 0, 0);
+    
+  }
+
+  handleDragEnd(ev): void {
+    ev.target.style.opacity = '1';
+  }
+
+  handleDragOver(ev): void {
+    ev.preventDefault();
+    document.getElementById("update-block").classList.add("hovered");
+  }
+
+  handleDragEnter(ev): void {
+    document.getElementById("update-block").classList.add("hovered");
+  }
+
+  handleDragLeave(ev): void {
+    document.getElementById("update-block").classList.remove("hovered");
   }
 
   isAllSelected(): boolean {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
+    let numSelected = this.selection.selected.length;
+    let numRows = this.dataSource.data.length;
     return numSelected === numRows;
   }
 
@@ -163,7 +176,8 @@ export class TableComponent implements OnInit, OnDestroy {
       this.dataSource.data.forEach(row => this.selection.select(row));
   }
 
-  getDocument(id: number): void {
+  getDocument(id: number): any {
+  
     this.documentService.getDocumentById(id)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(res => {
@@ -172,32 +186,53 @@ export class TableComponent implements OnInit, OnDestroy {
         this.updCreateDate = res.CreateDate;
         this.updAuthor = res.Author;
         this.updId = res.Id;
-        this.beforeDocument = res;
-      });
+        this.previousDocument = res;   
+        console.log(this.selection);
+        console.log(this.selection.selected);
+        return res;
+        
+      });     
   }
 
+  cutDescription(description:string):string{
+    let lenght= description.length;     
+    if(lenght>30){
+      let newDescription=description.slice(0,15);
+      newDescription+=" ... ";
+      newDescription+=description.slice(lenght-1-15,lenght-1);
+      return newDescription;
+    }
+    else
+    return description;     
+  }  
+
   updateDocument(): void {
-    const updDocument = {
-      Id: this.updId, Name: this.updName, Description: this.updDescription, Author: this.updAuthor
+    let updDocument = {
+      Id: this.updId,
+      Name: this.updName,
+      Description: this.updDescription,
+      Author: this.updAuthor,
+      Type: this.previousDocument.Type,
+      CreateDate: this.previousDocument.CreateDate,
+      ModifiedDate: this.previousDocument.ModifiedDate
     };
-    this.documentService.updateDocument(updDocument as Document)
+    this.documentService.updateDocument(updDocument)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(res => {
         this.LoadDocuments();
       });
     this.selection.clear();
     this.updatePossibility = false;
-
     this.openSnackBar("Document '" + this.updName + "' was updated", "Ok");
   }
 
   cancelUpdate(): void {
-    this.updName = this.beforeDocument.Name;
-    this.updDescription = this.beforeDocument.Description;
-    this.updCreateDate = this.beforeDocument.CreateDate;
-    this.updAuthor = this.beforeDocument.Author;
-    this.updId = this.beforeDocument.Id;
-    this.beforeDocument = this.beforeDocument;
+    this.updName = this.previousDocument.Name;
+    this.updDescription = this.previousDocument.Description;
+    this.updCreateDate = this.previousDocument.CreateDate;
+    this.updAuthor = this.previousDocument.Author;
+    this.updId = this.previousDocument.Id;
+    this.previousDocument = this.previousDocument;
     this.updatePossibility = false;
   }
 
@@ -206,10 +241,6 @@ export class TableComponent implements OnInit, OnDestroy {
     if (event.keyCode === keyCode.enter) {
       this.trigger.closePanel();
       this.Search();
-    }
-    if (event.keyCode === keyCode.space) {
-      console.log(this.selection);
-
     }
   }
 
@@ -286,12 +317,20 @@ export class TableComponent implements OnInit, OnDestroy {
       map(value => this._filter(value))
     );
 
+
     fromEvent(this.inputUpdate.nativeElement, 'keyup')
       .pipe(
         debounceTime(200),
         distinctUntilChanged(),
         tap(() => {
-          this.updatePossibility = true;
+          let updDocument = {
+            Id: this.updId, Name: this.updName, Description: this.updDescription, Author: this.updAuthor, Type: this.previousDocument.Type, CreateDate: this.previousDocument.CreateDate, ModifiedDate: this.previousDocument.ModifiedDate,
+          };       
+          if (JSON.stringify(this.previousDocument) === JSON.stringify(updDocument)) {
+            this.updatePossibility = false;
+          }
+          else
+            this.updatePossibility = true
         })
       )
       .pipe(takeUntil(this.unsubscribe$))
@@ -300,8 +339,8 @@ export class TableComponent implements OnInit, OnDestroy {
 
   LoadDocuments(): void {
     this.updateListOfDocuments(this.pageSize, this.pageNumber, this.input.nativeElement.value, this.activeCriteria, this.direction);
+    
   }
-
   private _filter(filter: string): string[] {
     const filterValue = filter.toLowerCase();
     if (this.options.length === 0) {
