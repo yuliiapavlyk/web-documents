@@ -134,7 +134,7 @@ export class TableComponent implements OnInit, OnDestroy {
     document.getElementById("update-block").classList.remove("hovered");
     ev.preventDefault();
     this.getDocument(this.dropId);
-   
+  
     this.dropElement = true;
   }
 
@@ -142,9 +142,8 @@ export class TableComponent implements OnInit, OnDestroy {
     this.dropId = id;
     ev.target.style.opacity = '0.4';       
     const img = document.createElement("img");
-    img.src = "http://s1.iconbird.com/ico/0612/GooglePlusInterfaceIcons/w128h1281338911594add.png";
-    ev.dataTransfer.setDragImage(img, 0, 0);
-    
+    img.src = "http://cdn.canadiancontent.net/t/icon/70/indeep-notes.png";
+    ev.dataTransfer.setDragImage(img, 0, 0);    
   }
 
   handleDragEnd(ev): void {
@@ -176,8 +175,8 @@ export class TableComponent implements OnInit, OnDestroy {
       this.dataSource.data.forEach(row => this.selection.select(row));
   }
 
-  getDocument(id: number): any {
-  
+
+  getDocument(id: number): any {  
     this.documentService.getDocumentById(id)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(res => {
@@ -189,12 +188,17 @@ export class TableComponent implements OnInit, OnDestroy {
         this.previousDocument = res;   
         console.log(this.selection);
         console.log(this.selection.selected);
-        return res;
-        
+        console.log(this.selection.hasValue());
+        console.log( this.selection.isSelected(res));
+        this.selection.select(res);
+        console.log( this.selection.isSelected(res));
+        this.selection.toggle(res);
+        return this.previousDocument=res;        
       });     
   }
 
-  cutDescription(description:string):string{
+
+  transformDescription(description:string):string{
     let lenght= description.length;     
     if(lenght>30){
       let newDescription=description.slice(0,15);
