@@ -33,7 +33,6 @@ export class TableComponent implements OnInit, OnDestroy {
   filteredOptions: Observable<string[]>;
   options: string[] = [];
   documents: Document[];
-  docs = [this.documents];
   paginator: PagedListDocument;
   dataSource = new MatTableDataSource<Document>(this.documents);
   newDocument: number;
@@ -44,7 +43,6 @@ export class TableComponent implements OnInit, OnDestroy {
   updCreateDate: Date;
   updId: number;
   updatePossibility: boolean = false;
-  index: number = 1;
   lastArgument: any;
   addSuccessfully: boolean;
   addedDocument: Document;
@@ -134,13 +132,14 @@ export class TableComponent implements OnInit, OnDestroy {
     return numSelected === numRows;
   }
 
-  masterToggle() {
+  masterToggle() : void {
 
     this.isAllSelected() ?
       this.selection.clear() :
       this.dataSource.data.forEach(row => this.selection.select(row));
   }
-  getDocument(id: number) {
+
+  getDocument(id: number) : void {
     console.log(this.selection);
 
     this.updatePossibility = true;
@@ -153,7 +152,8 @@ export class TableComponent implements OnInit, OnDestroy {
     })
 
   }
-  updateDocument() {
+
+  updateDocument(): void {
     const updDocument = {
       Id: this.updId, Name: this.updName, Description: this.updDescription, Author: this.updAuthor
     };
@@ -176,9 +176,7 @@ export class TableComponent implements OnInit, OnDestroy {
     if (this.selection.selected.length != 0) {
       const array = this.getIdsArray();
       this.documentService.deleteDocuments(array).subscribe(result => {
-        this.index = 1;
         this.pageNumber = 0;
-        this.docs.length = 0;
         this.LoadDocuments();
       }
       );
@@ -196,14 +194,10 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   Search(): void {
-
     let searchvalue: string = this.input.nativeElement.value.replace(/\s+/g, ' ').trim().toLowerCase();
-
     this.hint = "";
-    this.docs.length = 0;
     this.pageNumber = 0;
-    this.index = 1;
-    this.LoadDocuments();
+    this.LoadDocuments(searchvalue);
   }
 
   onPageChange(event: PageEvent): void {
@@ -216,13 +210,10 @@ export class TableComponent implements OnInit, OnDestroy {
     this.activeCriteria = event.active;
     this.direction = event.direction ? event.direction : 'asc';
     this.pageNumber = 0;
-    this.index = 1;
-    this.docs.length = 0;
     this.LoadDocuments();
   }
 
   ngOnInit(): void {
-    
     this.historyService.getSearcHistory().subscribe(
       respone => {
         if (respone.length != 0) {
@@ -235,11 +226,11 @@ export class TableComponent implements OnInit, OnDestroy {
       }
     );
     this.updateListOfDocuments(this.pageSize, this.pageNumber, '', this.activeCriteria, this.direction);
-   
+
   }
 
-  LoadDocuments(): void {
-    this.updateListOfDocuments(this.pageSize, this.pageNumber, this.input.nativeElement.value, this.activeCriteria, this.direction);
+  LoadDocuments(searchvalue: string = this.input.nativeElement.value): void {
+    this.updateListOfDocuments(this.pageSize, this.pageNumber, searchvalue, this.activeCriteria, this.direction);
   }
 
   private _filter(filter: string): string[] {
@@ -253,7 +244,3 @@ export class TableComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 }
-
-
-
-
