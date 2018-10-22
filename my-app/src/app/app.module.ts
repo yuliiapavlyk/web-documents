@@ -50,7 +50,8 @@ import { AddDocumentComponent } from './add-document/add-document.component';
     MatSelectModule,
     MatSnackBarModule,
     MatTooltipModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatSnackBarModule
 
   ],
   providers: [
