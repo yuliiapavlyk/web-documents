@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, HostListener, OnDestroy, ElementRef, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener, OnDestroy, ElementRef, Output, EventEmitter, Input, Renderer2} from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatSort, MatTableDataSource, MatPaginator } from '@angular/material';
 import { MatDialog } from '@angular/material/dialog';
@@ -17,7 +17,7 @@ import { PagedListDocument } from '../models/pagedListDocument';
 import { DocumentService } from '../services/document.service';
 import { HistoryService } from '../services/history.service';
 import { AddDocumentComponent } from '../add-document/add-document.component';
-
+import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog.component';
 
 export enum keyCode {
   enter = 13
@@ -69,6 +69,7 @@ export class TableComponent implements OnInit, OnDestroy {
   constructor(private documentService: DocumentService,
     private historyService: HistoryService,
     public dialog: MatDialog,
+    private renderer: Renderer2,
     public snackBar: MatSnackBar) {
   }
 
@@ -138,36 +139,42 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   handleDrop(ev): void {
-    document.getElementById("update-block").classList.remove("hovered");
+    this.renderer.removeClass(this.inputUpdate.nativeElement,'hovered' );
     ev.preventDefault();
     this.getDocument(this.dropId);
-
+    this.updatePossibility = false;
     this.dropElement = true;
   }
 
-  handleDragStart(ev, id: number): void {
-    this.dropId = id;
+  handleDragStart(ev, row): void {
+    this.dropId = row.Id;
+    this.dropElement = false;
+    this.selection.clear();
+    this.selection.select(row);
     ev.target.style.opacity = '0.4';
-    const img = document.createElement("img");
-    img.src = "http://cdn.canadiancontent.net/t/icon/70/indeep-notes.png";
-    ev.dataTransfer.setDragImage(img, 0, 0);
+    let image = this.renderer.createElement('img');
+    this.renderer.setProperty(image, 'src','http://cdn.canadiancontent.net/t/icon/70/indeep-notes.png' );
+    ev.dataTransfer.setDragImage(image, 0, 0);
   }
 
   handleDragEnd(ev): void {
     ev.target.style.opacity = '1';
+    if(!this.dropElement) {
+      this.selection.clear();
+    }
   }
 
   handleDragOver(ev): void {
     ev.preventDefault();
-    document.getElementById("update-block").classList.add("hovered");
+    this.renderer.addClass(this.inputUpdate.nativeElement,'hovered' );
   }
 
   handleDragEnter(ev): void {
-    document.getElementById("update-block").classList.add("hovered");
+    this.renderer.addClass(this.inputUpdate.nativeElement,'hovered' );
   }
 
   handleDragLeave(ev): void {
-    document.getElementById("update-block").classList.remove("hovered");
+    this.renderer.removeClass(this.inputUpdate.nativeElement,'hovered' );
   }
 
   isAllSelected(): boolean {
@@ -192,12 +199,7 @@ export class TableComponent implements OnInit, OnDestroy {
         this.updAuthor = res.Author;
         this.updId = res.Id;
         this.previousDocument = res;
-        console.log(this.selection);
-        console.log(this.selection.selected);
-        console.log(this.selection.hasValue());
-        console.log(this.selection.isSelected(res));
         this.selection.select(res);
-        console.log(this.selection.isSelected(res));
         this.selection.toggle(res);
         return this.previousDocument = res;
       });
@@ -257,13 +259,23 @@ export class TableComponent implements OnInit, OnDestroy {
   deleteDocuments(): void {
     if (this.selection.selected.length !== 0) {
       const array = this.getIdsArray();
-      this.documentService.deleteDocuments(array)
-        .pipe(takeUntil(this.unsubscribe$))
-        .subscribe(result => {
-          this.pageNumber = 0;
-          this.LoadDocuments();
+      const data = { title: 'Delete', message: `Are sure you want to delete ${array.length} document${array.length>1?'s':'' }?` };
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        width: '300px',
+        data: data
+      }
+      );
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.documentService.deleteDocuments(array)
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe(result => {
+              this.pageNumber = 0;
+              this.LoadDocuments();
+            }
+            );
         }
-        );
+      });
     }
   }
 

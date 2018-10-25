@@ -1,3 +1,4 @@
+<app-nav></app-nav>
 <div class="search">
   <mat-form-field style="width: 80%">
     <input matInput placeholder="Search documents" class="for-input" [formControl]="myControl" #input [matAutocomplete]="auto">
@@ -62,7 +63,7 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns; "  draggable="true"    (dragstart)="handleDragStart($event,row.Id)"  (dragend)="handleDragEnd($event)"
+      <tr mat-row *matRowDef="let row; columns: displayedColumns; "  draggable="true"    (dragstart)="handleDragStart($event, row)"  (dragend)="handleDragEnd($event)"
          class="pointer rows " ></tr>
     </table>
 
@@ -73,7 +74,7 @@
 
 
 
-  <div (drop)="handleDrop($event);" (dragover)="handleDragOver($event)" (dragenter)="handleDragEnter($event)" (dragleave)="handleDragLeave($event)"   id="update-block" #inputUpdate>
+  <div (drop)="handleDrop($event); " (dragover)="handleDragOver($event)" (dragenter)="handleDragEnter($event)" (dragleave)="handleDragLeave($event)"   id="update-block" #inputUpdate>
     <div class="data">
       <h3 style="color:lightslategrey; font-weight: 200">Update your document</h3>
       <label>Name</label>
@@ -111,6 +112,7 @@
       </button>
     </div>
   </div>
+
 </div>
 
 

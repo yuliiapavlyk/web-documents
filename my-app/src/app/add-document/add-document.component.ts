@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter, Inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter, Inject, ViewChild, ElementRef, Renderer2 } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -23,6 +23,7 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
   constructor(private documentService: DocumentService,
     public dialogRef: MatDialogRef<AddDocumentComponent>, public snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: Document,
+    private renderer: Renderer2,
     public dialog: MatDialog
   ) { }
   @ViewChild('file') inputFile: ElementRef;
@@ -101,8 +102,8 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
 
 
   setAccept(event) {
-    this.inputFile.nativeElement.accept = event.value;
-    const element: HTMLElement = this.inputFile.nativeElement as HTMLElement;
+    this.renderer.setProperty(this.inputFile.nativeElement, 'accept', event.value );
+      const element: HTMLElement = this.inputFile.nativeElement as HTMLElement;
     this.Select.value = this.accept;
     element.click();
   }
