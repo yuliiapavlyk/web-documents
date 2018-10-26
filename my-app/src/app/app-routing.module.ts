@@ -8,10 +8,10 @@ import { NotAuthorizedComponent } from './not-authorized/not-authorized.componen
 
 const routes: Routes = [
   
-  //{ path: '', component: SigninComponent, outlet:'guest'},
-  { path: 'signin', component: SigninComponent, canActivate: [AuthGuard],outlet: 'guest' },
+  { path: '', component: SigninComponent},
+  { path: 'signin', component: SigninComponent, canActivate: [AuthGuard]},
   { path: 'docs', component: TableComponent, canActivate: [AuthGuard] },
-  { path: 'not-auth', component: NotAuthorizedComponent, outlet:'guest'},
+  { path: 'not-auth', component: NotAuthorizedComponent},
   { path: '**', component: PageNotFoundComponent }
 ];
 

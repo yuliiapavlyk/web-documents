@@ -9,18 +9,14 @@ import { Router } from '@angular/router';
 })
 export class NavComponent implements OnInit {
   isLogin = false;
-  constructor( private router: Router, 
+  constructor(private router: Router,
     private authService: AuthService) { }
 
   ngOnInit() {
-    this.authService.isAuthenticated().subscribe(val => {
-      this.isLogin = val;
-    });
-
   }
 
-logout() {
-  this.authService.removeUserData();
-  this.router.navigate(['/']);
-}
+  logout() {
+    this.authService.removeUserData();
+    this.router.navigate(['/']);
+  }
 }
