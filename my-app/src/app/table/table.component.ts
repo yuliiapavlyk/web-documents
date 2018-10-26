@@ -15,7 +15,9 @@ import { Document } from '../models/document';
 import { DocumentParams } from '../models/documentsParams';
 import { PagedListDocument } from '../models/pagedListDocument';
 import { DocumentService } from '../services/document.service';
+import {FavouriteDocumentService} from '../services/favourite-document.service';
 import { AddDocumentComponent } from '../add-document/add-document.component';
+import { FavouriteDocument } from '../models/favouriteDocument';
 
 
 export enum keyCode {
@@ -29,7 +31,7 @@ export enum keyCode {
 })
 export class TableComponent implements OnInit, OnDestroy {
 
-  displayedColumns: string[] = ['Select', 'Name', 'Description', 'Author', 'CreateDate', 'ModifiedDate'];
+  displayedColumns: string[] = ['Select','Favourite', 'Name', 'Description', 'Author', 'CreateDate', 'ModifiedDate'];
   myControl = new FormControl();
   filteredOptions: Observable<string[]>;
   options: string[] = [];
@@ -39,7 +41,7 @@ export class TableComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource<Document>(this.documents);
   newDocument: number;
   dropId: number;
-  updDocument:Document;
+  updDocument: Document;
   updName: string = "";
   updDescription: string = "";
   updAuthor: string = "";
@@ -62,6 +64,8 @@ export class TableComponent implements OnInit, OnDestroy {
   dropElement: boolean = false;
   private unsubscribe$ = new Subject();
   selection = new SelectionModel<Document>(true, []);
+  messageForAdding:string="";
+  favourites:number[]=[];
 
 
   @ViewChild(MatAutocompleteTrigger) trigger: MatAutocompleteTrigger;
@@ -69,7 +73,8 @@ export class TableComponent implements OnInit, OnDestroy {
 
   constructor(private documentService: DocumentService,
     public dialog: MatDialog,
-    public snackBar: MatSnackBar) {
+    public snackBar: MatSnackBar,
+    private favouriteDocumentService: FavouriteDocumentService) {
   }
 
 
@@ -92,6 +97,14 @@ export class TableComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadFavourites(): void {
+    this.favouriteDocumentService.getFavouriteDocuments(1).subscribe(res => {
+   res.forEach(i=>   {this.favourites.push(i.Id)})    
+      
+    });
+    console.log(this.favourites);
+  }  
+
   addNewDocument(): void {
     this.IsDialogOpen = true;
     const dialogRef = this.dialog.open(AddDocumentComponent, {
@@ -112,7 +125,12 @@ export class TableComponent implements OnInit, OnDestroy {
       this.IsDialogOpen = !this.IsDialogOpen;
     });
   }
-
+  addToFavourite(id: number) {    
+    let favouriteDocument = { UserId: 1, DocumentId: id };
+    this.favouriteDocumentService.addToFavouriteDocuments(favouriteDocument as FavouriteDocument).subscribe(res=>
+      { 
+      })
+  }
   updateListOfDocuments(pageSize: number, pageNumber: number, search: string, activeCriteria: string, direction: string): void {
     this.documentService.getDocumentsByPageWithSearch(new DocumentParams(activeCriteria, direction, search, pageNumber, pageSize))
       .pipe(takeUntil(this.unsubscribe$))
@@ -128,22 +146,22 @@ export class TableComponent implements OnInit, OnDestroy {
           }
         }
       )
-  }  
+  }
 
   handleDrop(ev): void {
     document.getElementById("update-block").classList.remove("hovered");
     ev.preventDefault();
     this.getDocument(this.dropId);
-  
+
     this.dropElement = true;
   }
 
   handleDragStart(ev, id: number): void {
     this.dropId = id;
-    ev.target.style.opacity = '0.4';       
+    ev.target.style.opacity = '0.4';
     const img = document.createElement("img");
-    img.src = "http://cdn.canadiancontent.net/t/icon/70/indeep-notes.png";
-    ev.dataTransfer.setDragImage(img, 0, 0);    
+    img.src = "assets/add.png";
+    ev.dataTransfer.setDragImage(img, 0, 0);
   }
 
   handleDragEnd(ev): void {
@@ -176,7 +194,7 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
 
-  getDocument(id: number): any {  
+  getDocument(id: number): any {
     this.documentService.getDocumentById(id)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(res => {
@@ -185,30 +203,50 @@ export class TableComponent implements OnInit, OnDestroy {
         this.updCreateDate = res.CreateDate;
         this.updAuthor = res.Author;
         this.updId = res.Id;
-        this.previousDocument = res;   
-        console.log(this.selection);
-        console.log(this.selection.selected);
-        console.log(this.selection.hasValue());
-        console.log( this.selection.isSelected(res));
-        this.selection.select(res);
-        console.log( this.selection.isSelected(res));
-        this.selection.toggle(res);
-        return this.previousDocument=res;        
-      });     
+        this.previousDocument = res;
+        return res;
+      });
   }
 
 
-  transformDescription(description:string):string{
-    let lenght= description.length;     
-    if(lenght>30){
-      let newDescription=description.slice(0,15);
-      newDescription+=" ... ";
-      newDescription+=description.slice(lenght-1-15,lenght-1);
+  transformDescription(description: string): string {
+    // console.log(description + " description");
+    let columnSize = document.getElementsByClassName("mat-column-Description")[0].clientWidth;
+    // console.log(columnSize + " column size");
+
+    let element = document.createElement("canvas");
+
+    element.style.font = document.getElementsByTagName("td")[0].style.font;
+    let context = element.getContext("2d");
+    let metrics = context.measureText(description);
+    let descriptionSize = metrics.width;
+     
+    //console.log(descriptionSize + " descr size (px)");
+
+    if (descriptionSize > columnSize) {
+      let lenght = description.length;
+      // console.log(lenght + " lenght descr ( symbol)");
+      let symbolSize = descriptionSize / description.length;
+      //console.log(symbolSize + " symbol size (px)");
+      let containSymbols = columnSize / symbolSize;
+      let partSize = Math.round((containSymbols - 6) / 2);
+      //  console.log(partSize + " part size ( symbol)");
+
+      let newDescription = description.slice(0, partSize);
+      newDescription += " ... ";
+      newDescription += description.slice(lenght - partSize - 1, lenght - 1);
+      //console.log(newDescription.length + " newDescription (symbol)");
+      //console.log(newDescription.length*symbolSize + " newDescription (px)");
+
       return newDescription;
     }
-    else
-    return description;     
-  }  
+    else {
+
+      return description;
+    }
+
+
+  }
 
   updateDocument(): void {
     let updDocument = {
@@ -246,6 +284,7 @@ export class TableComponent implements OnInit, OnDestroy {
       this.trigger.closePanel();
       this.Search();
     }
+
   }
 
   deleteDocuments(): void {
@@ -329,7 +368,7 @@ export class TableComponent implements OnInit, OnDestroy {
         tap(() => {
           let updDocument = {
             Id: this.updId, Name: this.updName, Description: this.updDescription, Author: this.updAuthor, Type: this.previousDocument.Type, CreateDate: this.previousDocument.CreateDate, ModifiedDate: this.previousDocument.ModifiedDate,
-          };       
+          };
           if (JSON.stringify(this.previousDocument) === JSON.stringify(updDocument)) {
             this.updatePossibility = false;
           }
@@ -343,7 +382,7 @@ export class TableComponent implements OnInit, OnDestroy {
 
   LoadDocuments(): void {
     this.updateListOfDocuments(this.pageSize, this.pageNumber, this.input.nativeElement.value, this.activeCriteria, this.direction);
-    
+
   }
   private _filter(filter: string): string[] {
     const filterValue = filter.toLowerCase();

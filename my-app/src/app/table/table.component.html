@@ -1,5 +1,7 @@
+<div class ="main-column" >
+
 <div class="search">
-  <mat-form-field style="width: 80%">
+  <mat-form-field style="width: 85%">
     <input matInput placeholder="Search documents" class="for-input" [formControl]="myControl" #input [matAutocomplete]="auto">
     <mat-hint>{{hint}} </mat-hint>
     <mat-autocomplete #auto="matAutocomplete">
@@ -17,9 +19,10 @@
 </div>
 
 <div class="main-container">
-  <div class="table example-container" >
-    <table mat-table (matSortChange)="onSortChange($event)" [dataSource]="dataSource" class="sticky" matSort >
 
+  <div class="table example-container" >
+    <table mat-table (matSortChange)="onSortChange($event)" [dataSource]="dataSource" class="sticky" matSort >      
+   
       <ng-container matColumnDef="Select" >
         <th mat-header-cell *matHeaderCellDef class="checkColumn">
           <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected() "
@@ -33,6 +36,12 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="Favourite">
+          <th mat-header-cell *matHeaderCellDef> Favourite </th>
+          <td mat-cell *matCellDef="let element" class="checkColumn"> <img class="img-responsive" src="assets/whiteStar.png" (click)="addToFavourite(element.Id)"> </td>
+        </ng-container>
+  
+
       <ng-container matColumnDef="Name" id="rowElement nameElement"  >
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="nameColumn"> Name </th>
         <td mat-cell *matCellDef="let element " id="specRow" class="nameColumn">
@@ -40,14 +49,14 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="Description">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="descriptionColumn"> Description </th>
-        <td mat-cell *matCellDef="let element" class="descriptionColumn"> {{transformDescription(element.Description)}} </td>     
+      <ng-container matColumnDef="Description" >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="descriptionColumn" > Description </th>
+        <td mat-cell *matCellDef="let element" class="descriptionColumn" > {{transformDescription(element.Description)}} </td>     
       </ng-container>
 
       <ng-container matColumnDef="Author">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="nameColumn"> Author </th>
-        <td mat-cell *matCellDef="let element" class="nameColumn"> {{element.Author}} </td>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="nameColumn" > Author </th>
+        <td mat-cell *matCellDef="let element" class="nameColumn" > {{element.Author}} </td>
       </ng-container>
 
       <ng-container matColumnDef="CreateDate">
@@ -71,10 +80,10 @@
   </div>
 
 
-
-  <div (drop)="handleDrop($event);" (dragover)="handleDragOver($event)" (dragenter)="handleDragEnter($event)" (dragleave)="handleDragLeave($event)"   id="update-block" #inputUpdate>
+<div>
+  <div (drop)="handleDrop($event);" (dragover)="handleDragOver($event)" (dragenter)="handleDragEnter($event)" (dragleave)="handleDragLeave($event)" class="update-block"  id="update-block" #inputUpdate>
     <div class="data">
-      <h3 style="color:lightslategrey; font-weight: 200">Update your document</h3>
+      <h3 >Update your document</h3>
       <label>Name</label>
       <div>
         <mat-form-field class="input-field">
@@ -85,7 +94,7 @@
       <div>
         <mat-form-field class="input-field">
           <textarea matInput [(ngModel)]="updDescription" value="updDescription" [disabled]="!selection.hasValue()  && !dropElement "
-            rows="5"></textarea>
+            rows="5" ></textarea>
         </mat-form-field>
       </div>
 
@@ -111,5 +120,5 @@
     </div>
   </div>
 </div>
-
-
+</div>
+</div>

@@ -20,6 +20,9 @@ import { TableComponent } from './table/table.component';
 import { NavComponent } from './nav/nav.component';
 import { LocalizedDatePipe } from './pipes/localized-date.pipe';
 import { AddDocumentComponent } from './add-document/add-document.component';
+import { AppRoutingModule } from './app-routing.module';
+import { FavouriteDocumentComponent } from './favourite-document/favourite-document.component';
+import { MenuComponent } from './menu/menu.component';
 
 
 
@@ -30,7 +33,9 @@ import { AddDocumentComponent } from './add-document/add-document.component';
     ConfirmDialogComponent,
     NavComponent,
     LocalizedDatePipe,
-    AddDocumentComponent
+    AddDocumentComponent,
+    FavouriteDocumentComponent,
+    MenuComponent
   ],
   imports: [
     BrowserModule,
@@ -51,7 +56,8 @@ import { AddDocumentComponent } from './add-document/add-document.component';
     MatSnackBarModule,
     MatTooltipModule,
     ReactiveFormsModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    AppRoutingModule
 
   ],
   providers: [
