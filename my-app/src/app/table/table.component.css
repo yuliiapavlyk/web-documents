@@ -1,19 +1,73 @@
-table{
-    width: 100%
+
+.for-input{
+    display: flex;
+    width: 80%; 
+    justify-content: left;   
+}
+.search{
+    display: flex ;
+    width: 75%;
+    justify-content: space-between;
+}
+.main-container{
+    display: flex;
+    flex-flow: row;
+    
+ 
+}
+.table{
+    width: 75%;
+}
+#update-block{
+border-left: 1px solid  rgb(240, 241, 241);
+position: fixed;
+float: right;
+right: 0;
+width: 25%;
+height: 80%;
+overflow: auto;
+}
+.data{
+    margin: 20%;
+   
 }
 .for-buttons{       
     display: flex;
-    justify-content: flex-end ;    
-}
-td,th {
-    width: 25%;
+    justify-content: flex-start ;    
 }
 
+.checkColumn{
+width: 10% ;
+}
+.nameColumn{
+    width: 15% ;
+    }
+    .description{
+        width: 25% ;
+    }
+.buttons{
+    margin: 1%;
+}
 .paginator{
     display: flex;
     justify-content: flex-end;
 }
 
+.inputSearch{
+    width: 100%;
+}
 .inputPage{
     width: 20px;
 }
+.input-field{
+    width: 80%;
+}
+.pointer{
+    cursor: grab;
+}
+button{
+    margin-right: 3%
+}
+.hovered {
+    border: dotted 2px gray !important;
+  }

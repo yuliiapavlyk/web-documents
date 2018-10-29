@@ -3,21 +3,28 @@ import { NgModule, LOCALE_ID } from '@angular/core';
 import { HttpModule } from '@angular/http';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatButtonModule, MatCheckboxModule } from '@angular/material';
+import { MatButtonModule, MatCheckboxModule, MatSnackBarModule, MatTooltipModule , MatAutocompleteModule,  } from '@angular/material';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from'@angular/material';
 import { MatDialogModule } from '@angular/material/dialog';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 
 import { AppComponent } from './app.component';
+import { AuthGuard } from './auth/auth.guard';
+import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
 import { TableComponent } from './table/table.component';
 import { NavComponent } from './nav/nav.component';
 import { LocalizedDatePipe } from './pipes/localized-date.pipe';
 import { AddDocumentComponent } from './add-document/add-document.component';
+import { SigninComponent } from './auth/signin/signin.component';
+import { AppRoutingModule } from './app-routing.module';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { NotAuthorizedComponent } from './not-authorized/not-authorized.component';
 
 
 
@@ -25,30 +32,43 @@ import { AddDocumentComponent } from './add-document/add-document.component';
   declarations: [
     AppComponent,
     TableComponent,
+    ConfirmDialogComponent,
     NavComponent,
     LocalizedDatePipe,
-    AddDocumentComponent
+    AddDocumentComponent,
+    SigninComponent,
+    PageNotFoundComponent,
+    NotAuthorizedComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     MatButtonModule, MatCheckboxModule,
     MatTableModule,
+    MatAutocompleteModule,
     MatPaginatorModule,
     MatSortModule,
+    MatProgressSpinnerModule,
     MatToolbarModule, MatSortModule,
     HttpModule,
     HttpClientModule,
     MatInputModule,
     MatDialogModule,
     FormsModule,
-    MatSelectModule
+    MatSelectModule,
+    MatSnackBarModule,
+    MatTooltipModule,
+    ReactiveFormsModule,
+    MatSnackBarModule,
+    AppRoutingModule
 
   ],
   providers: [
+    AuthGuard
   ],
   entryComponents: [
     AddDocumentComponent,
+    ConfirmDialogComponent,
     TableComponent
   ],
   bootstrap: [AppComponent]
