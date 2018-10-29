@@ -32,6 +32,7 @@ export class FavouriteDocumentService {
       return this.http.post<FavouriteDocument>(this.url, document, this.httpOptions).pipe(
         catchError(val => of(val)));
     }
+    
   deleteFromFavouriteDocuments(document:FavouriteDocument): any{
     return this.http.request<FavouriteDocument>('delete', this.url, { body:document} ).pipe(
       catchError(this.handleError<FavouriteDocument>(`deleteFromFavouriteDocuments`)));
