@@ -129,11 +129,12 @@ export class TableComponent implements OnInit, OnDestroy {
     });
   }
 
-  check(id: number, indexPosition: number): void {
+  chooseActionWithFavouriteDoc(id: number, indexPosition: number): void {
+   
     let favourite = { UserId: 1, DocumentId: id };
     this.favourites.indexOf(id) != -1 ? this.deleteFromFavourite(favourite, indexPosition) : this.addToFavourite(favourite, indexPosition);
   }
-
+  
   addToFavourite(favouriteDocument, indexPosition: number) {
     this.favouriteDocumentService.addToFavouriteDocuments(favouriteDocument as FavouriteDocument).subscribe()
     this.favourites.push(favouriteDocument.DocumentId);
@@ -162,7 +163,7 @@ export class TableComponent implements OnInit, OnDestroy {
       .subscribe(
         result => {
           this.paginator = result,
-            this.dataSource.data = result.Items;
+          this.dataSource.data = result.Items;         
           if (result.Message != null) {
             this.hint = 'Showing results for the query: ' + result.Message;
           }
