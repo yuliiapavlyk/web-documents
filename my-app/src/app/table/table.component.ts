@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild, HostListener, OnDestroy, ElementRef, Output, EventEmitter, Input, Renderer2} from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener, OnDestroy, ElementRef, Output, EventEmitter, Input, Renderer2,ViewChildren,QueryList} from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
-import { MatSort, MatTableDataSource, MatPaginator } from '@angular/material';
+import {  MatTableDataSource, MatPaginator } from '@angular/material';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject, fromEvent, Observable } from 'rxjs';
 import { takeUntil, startWith, map } from 'rxjs/operators';
@@ -15,6 +15,8 @@ import { Document } from '../models/document';
 import { DocumentParams } from '../models/documentsParams';
 import { PagedListDocument } from '../models/pagedListDocument';
 import { DocumentService } from '../services/document.service';
+import { FavouriteDocumentService } from '../services/favourite-document.service';
+import { FavouriteDocument } from '../models/favouriteDocument';
 import { HistoryService } from '../services/history.service';
 import { AddDocumentComponent } from '../add-document/add-document.component';
 import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog.component';
@@ -29,8 +31,9 @@ export enum keyCode {
   styleUrls: ['./table.component.css']
 })
 export class TableComponent implements OnInit, OnDestroy {
+  @ViewChildren("mytable") mytable: QueryList<ElementRef>;
 
-  displayedColumns: string[] = ['Select', 'Name', 'Description', 'Author', 'CreateDate', 'ModifiedDate'];
+  displayedColumns: string[] = ['Select', 'Favourite', 'Name', 'Description', 'Author', 'CreateDate', 'ModifiedDate'];
   myControl = new FormControl();
   filteredOptions: Observable<string[]>;
   options: string[] = [];
@@ -46,6 +49,8 @@ export class TableComponent implements OnInit, OnDestroy {
   updCreateDate: Date;
   updId: number;
   updatePossibility: boolean = false;
+  index: number = 1;
+  indexPosition: number = 1;
   lastArgument: any;
   addSuccessfully: boolean;
   addedDocument: Document;
@@ -61,6 +66,8 @@ export class TableComponent implements OnInit, OnDestroy {
   dropElement: boolean = false;
   private unsubscribe$ = new Subject();
   selection = new SelectionModel<Document>(true, []);
+  messageForAdding: string = "";
+  favourites: number[] = [];
 
 
   @ViewChild(MatAutocompleteTrigger) trigger: MatAutocompleteTrigger;
@@ -70,9 +77,9 @@ export class TableComponent implements OnInit, OnDestroy {
     private historyService: HistoryService,
     public dialog: MatDialog,
     private renderer: Renderer2,
-    public snackBar: MatSnackBar) {
+    public snackBar: MatSnackBar,
+    private favouriteDocumentService:FavouriteDocumentService) {
   }
-
 
   @Input() length: number;
 
@@ -93,6 +100,17 @@ export class TableComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadFavourites(): void {
+    this.favouriteDocumentService.getFavouriteDocuments(1).subscribe(res => {
+      if (res != null) {
+        res.forEach(i => {
+          this.favourites.push(i.Id)
+        }
+        )
+      }
+    });
+  }
+
   addNewDocument(): void {
     this.IsDialogOpen = true;
     const dialogRef = this.dialog.open(AddDocumentComponent, {
@@ -103,7 +121,6 @@ export class TableComponent implements OnInit, OnDestroy {
     }
     );
     dialogRef.afterClosed().subscribe(result => {
-
       if (result !== undefined) {
         this.addedDocument = result;
         this.dataSource.data.unshift(this.addedDocument as Document);
@@ -113,6 +130,34 @@ export class TableComponent implements OnInit, OnDestroy {
       this.IsDialogOpen = !this.IsDialogOpen;
     });
   }
+
+  chooseActionWithFavouriteDoc(id: number, indexPosition: number): void {
+   
+    let favourite = { UserId: 1, DocumentId: id };
+    this.favourites.indexOf(id) != -1 ? this.deleteFromFavourite(favourite, indexPosition) : this.addToFavourite(favourite, indexPosition);
+  }
+  
+  addToFavourite(favouriteDocument, indexPosition: number) {
+    this.favouriteDocumentService.addToFavouriteDocuments(favouriteDocument as FavouriteDocument).subscribe()
+    this.favourites.push(favouriteDocument.DocumentId);
+    let image = this.mytable.toArray()[indexPosition];
+    this.renderer.setProperty(image.nativeElement, 'src', "assets/yellowStar.png");
+  }
+
+  deleteFromFavourite(favouriteDocument, indexPosition: number) {
+    this.favouriteDocumentService.deleteFromFavouriteDocuments(favouriteDocument as FavouriteDocument).subscribe()
+    this.favourites.splice(this.favourites.indexOf(favouriteDocument.DocumentId), 1);
+    let image = this.mytable.toArray()[indexPosition];
+    this.renderer.setProperty(image.nativeElement, 'src', "assets/whiteStar.png");
+  }
+
+  setImage(id: number) {
+    if (this.favourites.indexOf(id) != -1) {
+      return "assets/yellowStar.png"
+    }
+    else return "assets/whiteStar.png";
+  }
+
 
   updateListOfDocuments(pageSize: number, pageNumber: number, search: string, activeCriteria: string, direction: string): void {
     this.documentService.getDocumentsByPageWithSearch(new DocumentParams(activeCriteria, direction, search, pageNumber, pageSize))
@@ -127,7 +172,7 @@ export class TableComponent implements OnInit, OnDestroy {
             }
           );
           this.paginator = result,
-            this.dataSource.data = result.Items;
+          this.dataSource.data = result.Items;         
           if (result.Message != null) {
             this.hint = 'Showing results for the query: ' + result.Message;
           }
@@ -201,21 +246,30 @@ export class TableComponent implements OnInit, OnDestroy {
         this.previousDocument = res;
         this.selection.select(res);
         this.selection.toggle(res);
-        return this.previousDocument = res;
+        return this.previousDocument = res;   
       });
   }
 
-
   transformDescription(description: string): string {
-    let lenght = description.length;
-    if (lenght > 30) {
-      let newDescription = description.slice(0, 15);
+    let columnSize = document.getElementsByClassName("mat-column-Description")[0].clientWidth;
+    let element = document.createElement("canvas");
+    element.style.font = document.getElementsByTagName("td")[0].style.font;
+    let context = element.getContext("2d");
+    let metrics = context.measureText(description);
+    let descriptionSize = metrics.width;
+    if (descriptionSize > columnSize) {
+      let lenght = description.length;
+      let symbolSize = descriptionSize / description.length;
+      let containSymbols = columnSize / symbolSize;
+      let partSize = Math.round((containSymbols - 6) / 2);
+      let newDescription = description.slice(0, partSize);
       newDescription += " ... ";
-      newDescription += description.slice(lenght - 1 - 15, lenght - 1);
+      newDescription += description.slice(lenght - partSize - 1, lenght - 1);
       return newDescription;
     }
-    else
+    else {
       return description;
+    }
   }
 
   updateDocument(): void {
@@ -309,6 +363,7 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.loadFavourites();
     this.historyService.getSearcHistory().subscribe(
       respone => {
         if (respone.length != 0) {

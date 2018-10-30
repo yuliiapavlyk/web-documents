@@ -21,6 +21,8 @@ import { TableComponent } from './table/table.component';
 import { NavComponent } from './nav/nav.component';
 import { LocalizedDatePipe } from './pipes/localized-date.pipe';
 import { AddDocumentComponent } from './add-document/add-document.component';
+import { FavouriteDocumentComponent } from './favourite-document/favourite-document.component';
+import { MenuComponent } from './menu/menu.component';
 import { SigninComponent } from './auth/signin/signin.component';
 import { AppRoutingModule } from './app-routing.module';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
@@ -36,6 +38,8 @@ import { NotAuthorizedComponent } from './not-authorized/not-authorized.componen
     NavComponent,
     LocalizedDatePipe,
     AddDocumentComponent,
+    FavouriteDocumentComponent,
+    MenuComponent,
     SigninComponent,
     PageNotFoundComponent,
     NotAuthorizedComponent
