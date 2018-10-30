@@ -15,14 +15,18 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 
 import { AppComponent } from './app.component';
+import { AuthGuard } from './auth/auth.guard';
 import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
 import { TableComponent } from './table/table.component';
 import { NavComponent } from './nav/nav.component';
 import { LocalizedDatePipe } from './pipes/localized-date.pipe';
 import { AddDocumentComponent } from './add-document/add-document.component';
-import { AppRoutingModule } from './app-routing.module';
 import { FavouriteDocumentComponent } from './favourite-document/favourite-document.component';
 import { MenuComponent } from './menu/menu.component';
+import { SigninComponent } from './auth/signin/signin.component';
+import { AppRoutingModule } from './app-routing.module';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { NotAuthorizedComponent } from './not-authorized/not-authorized.component';
 
 
 
@@ -35,7 +39,10 @@ import { MenuComponent } from './menu/menu.component';
     LocalizedDatePipe,
     AddDocumentComponent,
     FavouriteDocumentComponent,
-    MenuComponent
+    MenuComponent,
+    SigninComponent,
+    PageNotFoundComponent,
+    NotAuthorizedComponent
   ],
   imports: [
     BrowserModule,
@@ -61,6 +68,7 @@ import { MenuComponent } from './menu/menu.component';
 
   ],
   providers: [
+    AuthGuard
   ],
   entryComponents: [
     AddDocumentComponent,

@@ -1,0 +1,18 @@
+.example-form {
+    font-family: Arial, Helvetica, sans-serif;
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+  }
+ .window {
+    display: flex;
+    justify-content: center;
+  } 
+.example-container > * {
+    width: calc(100%/3);
+  }
+  
+.containerUpdate {
+    width: 100%;
+  }
+  

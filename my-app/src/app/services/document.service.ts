@@ -56,7 +56,7 @@ export class DocumentService {
   }
 
   updateDocument( document: Document): Observable<HttpResponse<any>> {
-    return this.http.put(`${this.url}/${document.Id}`,document, this.httpOptions).pipe(
+    return this.http.put(`${this.url}${document.Id}`,document, this.httpOptions).pipe(
       catchError(r => of(r))
     );
   }
