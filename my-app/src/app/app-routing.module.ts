@@ -13,7 +13,7 @@ const routes: Routes = [
   { path: '', component: SigninComponent},
   { path: 'signin', component: SigninComponent, canActivate: [AuthGuard]},
 
-  { path: 'main', component: TableComponent, canActivate: [AuthGuard] },
+  { path: 'docs', component: TableComponent, canActivate: [AuthGuard] },
   { path: 'favDocument', component: FavouriteDocumentComponent ,canActivate: [AuthGuard]},
   { path: 'not-auth', component: NotAuthorizedComponent},
   { path: '**', component: PageNotFoundComponent }
