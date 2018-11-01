@@ -27,6 +27,8 @@ import { SigninComponent } from './auth/signin/signin.component';
 import { AppRoutingModule } from './app-routing.module';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { NotAuthorizedComponent } from './not-authorized/not-authorized.component';
+import { MainLayoutComponent } from './main-layout/main-layout.component';
+import { GuestlayoutComponent } from './guestlayout/guestlayout.component';
 
 
 
@@ -42,7 +44,9 @@ import { NotAuthorizedComponent } from './not-authorized/not-authorized.componen
     MenuComponent,
     SigninComponent,
     PageNotFoundComponent,
-    NotAuthorizedComponent
+    NotAuthorizedComponent,
+    MainLayoutComponent,
+    GuestlayoutComponent
   ],
   imports: [
     BrowserModule,
