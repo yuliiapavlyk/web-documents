@@ -9,19 +9,17 @@ mat-card {
     display: flex;
     flex-direction: column;
   }
+
  .window {
     display: flex;
     justify-content: center;
+    padding: 60px 1rem;
   } 
 .example-container > * {
     width: calc(100%/3);
   }
-  .signin-content {
-    padding: 60px 1rem;
-  }
+  
 .containerUpdate {
     width: 100%;
   }
-.registration  {
-  margin: 2% 0 0 0 ;
-}
+  

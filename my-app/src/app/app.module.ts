@@ -8,6 +8,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from'@angular/material';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -29,6 +30,7 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
 import { NotAuthorizedComponent } from './not-authorized/not-authorized.component';
 import { MainLayoutComponent } from './main-layout/main-layout.component';
 import { GuestlayoutComponent } from './guestlayout/guestlayout.component';
+import { SignupComponent } from './auth/signup/signup.component';
 
 
 
@@ -46,7 +48,8 @@ import { GuestlayoutComponent } from './guestlayout/guestlayout.component';
     PageNotFoundComponent,
     NotAuthorizedComponent,
     MainLayoutComponent,
-    GuestlayoutComponent
+    GuestlayoutComponent,
+    SignupComponent
   ],
   imports: [
     BrowserModule,
@@ -55,6 +58,7 @@ import { GuestlayoutComponent } from './guestlayout/guestlayout.component';
     MatTableModule,
     MatAutocompleteModule,
     MatPaginatorModule,
+    MatCardModule,
     MatSortModule,
     MatProgressSpinnerModule,
     MatToolbarModule, MatSortModule,

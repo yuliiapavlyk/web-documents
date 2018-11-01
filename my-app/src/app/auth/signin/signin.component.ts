@@ -14,12 +14,13 @@ export class SigninComponent implements OnInit {
   constructor(private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private snackBar: MatSnackBar) { }
+    private snackBar: MatSnackBar) {
+      if (this.authService.isLogined()) {
+        this.router.navigate(['/']);
+      }
+     }
 
   ngOnInit() {
-    if (this.authService.isLogined()) {
-      this.router.navigate(['/docs']);
-    }
   }
 
   cancel(form?: NgForm): void {
@@ -30,7 +31,7 @@ export class SigninComponent implements OnInit {
 
   OnSubmit(form: NgForm) {
     if (this.authService.setUserData(form.value)) {
-      this.router.navigate(['/docs']);
+      this.router.navigate(['/']);
       return;
     }
 
