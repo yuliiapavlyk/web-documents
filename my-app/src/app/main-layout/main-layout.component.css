@@ -1,0 +1,9 @@
+.main{
+    display: flex;
+}
+.menu{
+    width: 10%;   
+}
+.content{
+    width: 90%;
+}

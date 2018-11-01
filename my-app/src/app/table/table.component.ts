@@ -160,7 +160,7 @@ export class TableComponent implements OnInit, OnDestroy {
         result => {
           this.historyService.getSearcHistory().subscribe(
             respone => {
-              if (respone.length != 0) {
+              if (respone != null) {
                 this.options = respone.map(i => i.SearchQuery);
               }
             }
@@ -360,7 +360,7 @@ export class TableComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.historyService.getSearcHistory().subscribe(
       respone => {
-        if (respone.length != 0) {
+        if (respone != null) {
           this.options = respone.map(i => i.SearchQuery);
           this.filteredOptions = this.myControl.valueChanges.pipe(
             startWith(''),
