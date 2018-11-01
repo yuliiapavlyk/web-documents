@@ -31,9 +31,9 @@ export enum keyCode {
   styleUrls: ['./table.component.css']
 })
 export class TableComponent implements OnInit, OnDestroy {
-  @ViewChildren("mytable") mytable: QueryList<ElementRef>;
+  //@ViewChildren("mytable") mytable: QueryList<ElementRef>;
 
-  displayedColumns: string[] = ['Select', 'Favourite', 'Name', 'Description', 'Author', 'CreateDate', 'ModifiedDate'];
+  displayedColumns: string[] = ['Select', 'IsFavourite', 'Name', 'Description', 'Author', 'CreateDate', 'ModifiedDate'];
   myControl = new FormControl();
   filteredOptions: Observable<string[]>;
   options: string[] = [];
@@ -68,6 +68,8 @@ export class TableComponent implements OnInit, OnDestroy {
   selection = new SelectionModel<Document>(true, []);
   messageForAdding: string = "";
   favourites: number[] = [];
+  yellow:string="assets/yellowStar.png";
+  white:string="assets/whiteStar.png";
 
 
   @ViewChild(MatAutocompleteTrigger) trigger: MatAutocompleteTrigger;
@@ -131,33 +133,25 @@ export class TableComponent implements OnInit, OnDestroy {
     });
   }
 
-  chooseActionWithFavouriteDoc(id: number, indexPosition: number): void {
+  chooseActionWithFavouriteDoc( document:Document): void {  
    
-    let favourite = { UserId: 1, DocumentId: id };
-    this.favourites.indexOf(id) != -1 ? this.deleteFromFavourite(favourite, indexPosition) : this.addToFavourite(favourite, indexPosition);
+   
+  let favourite = { UserId: 1, DocumentId: document.Id };
+  document.IsFavourite ? this.deleteFromFavourite(favourite,document) : this.addToFavourite(favourite,document);
+ 
   }
   
-  addToFavourite(favouriteDocument, indexPosition: number) {
-    this.favouriteDocumentService.addToFavouriteDocuments(favouriteDocument as FavouriteDocument).subscribe()
-    this.favourites.push(favouriteDocument.DocumentId);
-    let image = this.mytable.toArray()[indexPosition];
-    this.renderer.setProperty(image.nativeElement, 'src', "assets/yellowStar.png");
+  addToFavourite(favouriteDocument,document) {
+    this.favouriteDocumentService.addToFavouriteDocuments(favouriteDocument as FavouriteDocument).subscribe(res=>{
+      document.IsFavourite=!document.IsFavourite;   
+    })
   }
 
-  deleteFromFavourite(favouriteDocument, indexPosition: number) {
-    this.favouriteDocumentService.deleteFromFavouriteDocuments(favouriteDocument as FavouriteDocument).subscribe()
-    this.favourites.splice(this.favourites.indexOf(favouriteDocument.DocumentId), 1);
-    let image = this.mytable.toArray()[indexPosition];
-    this.renderer.setProperty(image.nativeElement, 'src', "assets/whiteStar.png");
+  deleteFromFavourite(favouriteDocument,document) {
+    this.favouriteDocumentService.deleteFromFavouriteDocuments(favouriteDocument as FavouriteDocument).subscribe(res=>{
+      document.IsFavourite=!document.IsFavourite;
+    })
   }
-
-  setImage(id: number) {
-    if (this.favourites.indexOf(id) != -1) {
-      return "assets/yellowStar.png"
-    }
-    else return "assets/whiteStar.png";
-  }
-
 
   updateListOfDocuments(pageSize: number, pageNumber: number, search: string, activeCriteria: string, direction: string): void {
     this.documentService.getDocumentsByPageWithSearch(new DocumentParams(activeCriteria, direction, search, pageNumber, pageSize))
@@ -192,7 +186,7 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   handleDragStart(ev, row): void {
-    this.dropId = row.Id;
+   this.dropId = row.Id;
     this.dropElement = false;
     this.selection.clear();
     this.selection.select(row);
@@ -280,7 +274,8 @@ export class TableComponent implements OnInit, OnDestroy {
       Author: this.updAuthor,
       Type: this.previousDocument.Type,
       CreateDate: this.previousDocument.CreateDate,
-      ModifiedDate: this.previousDocument.ModifiedDate
+      ModifiedDate: this.previousDocument.ModifiedDate,
+      IsFavourite:this.previousDocument.IsFavourite
     };
     this.documentService.updateDocument(updDocument)
       .pipe(takeUntil(this.unsubscribe$))
@@ -363,7 +358,6 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.loadFavourites();
     this.historyService.getSearcHistory().subscribe(
       respone => {
         if (respone.length != 0) {

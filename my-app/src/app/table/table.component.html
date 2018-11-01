@@ -35,10 +35,11 @@
           </td>
         </ng-container>
 
-        <ng-container matColumnDef="Favourite">
-          <th mat-header-cell *matHeaderCellDef> Favourite </th>
-          <td mat-cell *matCellDef="let element ; let i = index" class="checkColumn"> <img class="img-responsive" [src]="setImage(element.Id)"
-              (click)="chooseActionWithFavouriteDoc(element.Id,i)" #mytable> </td>
+        <ng-container matColumnDef="IsFavourite">
+          <th mat-header-cell *matHeaderCellDef> State </th>
+           <td mat-cell *matCellDef="let element ;" class="checkColumn"> <img class="img-responsive" [src]="element.IsFavourite ? yellow : white"
+         
+              (click)="chooseActionWithFavouriteDoc(element)" >  </td>
         </ng-container>
 
 

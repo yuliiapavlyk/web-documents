@@ -37,8 +37,6 @@ export class DocumentService {
     return this.http.post<PagedListDocumentWithMessage>(`${this.url}search/`, docParams, this.httpOptions).pipe(
       catchError(this.handleError<PagedListDocumentWithMessage>(`getDocumentsByPage`)));
   }
-
-
   getDocumentById(id: number): Observable<Document> {
     return this.http.get<Document>(`${this.url}/${id}`).pipe(
       catchError(this.handleError<Document>(`getDocumentById`))
