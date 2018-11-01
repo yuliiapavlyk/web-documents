@@ -5,17 +5,49 @@ import { TableComponent } from './table/table.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { AuthGuard } from './auth/auth.guard';
 import { NotAuthorizedComponent } from './not-authorized/not-authorized.component';
-import{FavouriteDocumentComponent} from '../app/favourite-document/favourite-document.component'
+import { FavouriteDocumentComponent } from '../app/favourite-document/favourite-document.component'
 import { from } from 'rxjs';
+import { GuestlayoutComponent } from './guestlayout/guestlayout.component';
+import { MainLayoutComponent } from './main-layout/main-layout.component';
+import { SignupComponent } from './auth/signup/signup.component';
 
 const routes: Routes = [
-  
-  { path: '', component: SigninComponent},
-  { path: 'signin', component: SigninComponent, canActivate: [AuthGuard]},
 
-  { path: 'docs', component: TableComponent, canActivate: [AuthGuard] },
-  { path: 'favDocument', component: FavouriteDocumentComponent ,canActivate: [AuthGuard]},
-  { path: 'not-auth', component: NotAuthorizedComponent},
+  {
+    path: '', component: MainLayoutComponent, canActivate: [AuthGuard],
+    children: [
+      {
+        path: '',
+        component: TableComponent
+      },
+      {
+        path: 'docs',
+        component: TableComponent
+      },
+      {
+        path: 'favDocument',
+        component: FavouriteDocumentComponent
+      }
+
+    ]
+  },
+
+  {
+    path: '', component: GuestlayoutComponent,
+    children: [
+      {
+        path: 'login',
+        component: SigninComponent
+      },
+      {
+        path: 'signup',
+        component: SignupComponent
+      }
+    ]
+  },
+
+
+  { path: 'not-auth', component: NotAuthorizedComponent },
   { path: '**', component: PageNotFoundComponent }
 ];
 

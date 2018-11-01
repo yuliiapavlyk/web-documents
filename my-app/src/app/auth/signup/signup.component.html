@@ -1,10 +1,17 @@
-<div class="signin-content">
-<mat-card>
-  <mat-card-content>
 <div class="window">
 
-  <form class="example-form" #loginForm="ngForm" (ngSubmit)="OnSubmit(loginForm)">
-    <h1>Sign In</h1>
+<mat-card>
+  <mat-card-content>
+  <form class="example-form" #loginForm="ngForm">
+    <h1>Sign up</h1>
+    <mat-form-field class="containerUpdate">
+      <input matInput type="text" placeholder="Your first name" #FirstName ngModel name="Registration" placeholder="First name"
+        required>
+    </mat-form-field>
+    <mat-form-field class="containerUpdate">
+      <input matInput type="text" placeholder="Your last name" #LastName ngModel name="login" placeholder="Last name"
+        required>
+    </mat-form-field>
     <mat-form-field class="containerUpdate">
       <input matInput type="text" placeholder="Your username" #Email ngModel name="login" placeholder="Username"
         required>
@@ -17,16 +24,11 @@
     <div>
       <span>
         <button [disabled]="!loginForm.valid" mat-raised-button color="primary" type="submit">
-          Submit
+          Confirm
         </button>
       </span>
     </div>
   </form>
-
-  </div>
-  <a class="window registration" routerLink="/signup">
-    Create an Account
-  </a>
 </mat-card-content>
 </mat-card>
-</div>
+ </div>
