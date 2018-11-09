@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild, HostListener, OnDestroy, ElementRef, Output, EventEmitter, Input, Renderer2,ViewChildren,QueryList} from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener, OnDestroy, ElementRef, Output, EventEmitter, Input, Renderer2, ViewChildren, QueryList } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
-import {  MatTableDataSource, MatPaginator } from '@angular/material';
+import { MatTableDataSource, MatPaginator } from '@angular/material';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject, fromEvent, Observable } from 'rxjs';
 import { takeUntil, startWith, map } from 'rxjs/operators';
@@ -15,6 +15,8 @@ import { Document } from '../models/document';
 import { DocumentParams } from '../models/documentsParams';
 import { PagedListDocument } from '../models/pagedListDocument';
 import { DocumentService } from '../services/document.service';
+import { TransferService } from '../services/transfer.service';
+
 import { FavouriteDocumentService } from '../services/favourite-document.service';
 import { FavouriteDocument } from '../models/favouriteDocument';
 import { HistoryService } from '../services/history.service';
@@ -68,8 +70,8 @@ export class TableComponent implements OnInit, OnDestroy {
   selection = new SelectionModel<Document>(true, []);
   messageForAdding: string = "";
   favourites: number[] = [];
-  yellow:string="assets/yellowStar.png";
-  white:string="assets/whiteStar.png";
+  yellow: string = "assets/yellowStar.png";
+  white: string = "assets/whiteStar.png";
 
 
   @ViewChild(MatAutocompleteTrigger) trigger: MatAutocompleteTrigger;
@@ -80,7 +82,9 @@ export class TableComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     private renderer: Renderer2,
     public snackBar: MatSnackBar,
-    private favouriteDocumentService:FavouriteDocumentService) {
+    private favouriteDocumentService: FavouriteDocumentService,
+    private transferService: TransferService
+  ) {
   }
 
   @Input() length: number;
@@ -103,7 +107,7 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   loadFavourites(): void {
-    this.favouriteDocumentService.getFavouriteDocuments(1).subscribe(res => {
+    this.favouriteDocumentService.getFavouriteDocuments().subscribe(res => {
       if (res != null) {
         res.forEach(i => {
           this.favourites.push(i.Id)
@@ -133,24 +137,24 @@ export class TableComponent implements OnInit, OnDestroy {
     });
   }
 
-  chooseActionWithFavouriteDoc( document:Document): void {  
-   
-   
-  let favourite = { UserId: 1, DocumentId: document.Id };
-  document.IsFavourite ? this.deleteFromFavourite(favourite,document) : this.addToFavourite(favourite,document);
- 
-  }
-  
-  addToFavourite(favouriteDocument,document) {
-    this.favouriteDocumentService.addToFavouriteDocuments(favouriteDocument as FavouriteDocument).subscribe(res=>{
-      document.IsFavourite=!document.IsFavourite;   
-    })
+  chooseActionWithFavouriteDoc(document: Document): void {
+    let favourite = { UserId: 1, DocumentId: document.Id };
+    document.IsFavourite ? this.deleteFromFavourite(favourite, document) : this.addToFavourite(favourite, document);
   }
 
-  deleteFromFavourite(favouriteDocument,document) {
-    this.favouriteDocumentService.deleteFromFavouriteDocuments(favouriteDocument as FavouriteDocument).subscribe(res=>{
-      document.IsFavourite=!document.IsFavourite;
+  addToFavourite(favouriteDocument, document) {
+    this.favouriteDocumentService.addToFavouriteDocuments(favouriteDocument as FavouriteDocument).subscribe(res => {
+      document.IsFavourite = !document.IsFavourite;
     })
+    this.transferService.addDocumentFromFavourite(document);
+    //this.transferService.currentData.subscribe();
+  }
+
+  deleteFromFavourite(favouriteDocument, document) {
+    this.favouriteDocumentService.deleteFromFavouriteDocuments(favouriteDocument as FavouriteDocument).subscribe(res => {
+      document.IsFavourite = !document.IsFavourite;
+    })
+    this.transferService.removeDocumentFromFavourite(document);
   }
 
   updateListOfDocuments(pageSize: number, pageNumber: number, search: string, activeCriteria: string, direction: string): void {
@@ -166,7 +170,7 @@ export class TableComponent implements OnInit, OnDestroy {
             }
           );
           this.paginator = result,
-          this.dataSource.data = result.Items;         
+            this.dataSource.data = result.Items;
           if (result.Message != null) {
             this.hint = 'Showing results for the query: ' + result.Message;
           }
@@ -178,7 +182,7 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   handleDrop(ev): void {
-    this.renderer.removeClass(this.inputUpdate.nativeElement,'hovered' );
+    this.renderer.removeClass(this.inputUpdate.nativeElement, 'hovered');
     ev.preventDefault();
     this.getDocument(this.dropId);
     this.updatePossibility = false;
@@ -186,34 +190,34 @@ export class TableComponent implements OnInit, OnDestroy {
   }
 
   handleDragStart(ev, row): void {
-   this.dropId = row.Id;
+    this.dropId = row.Id;
     this.dropElement = false;
     this.selection.clear();
     this.selection.select(row);
     ev.target.style.opacity = '0.4';
     let image = this.renderer.createElement('img');
-    this.renderer.setProperty(image, 'src','http://cdn.canadiancontent.net/t/icon/70/indeep-notes.png' );
+    this.renderer.setProperty(image, 'src', 'http://cdn.canadiancontent.net/t/icon/70/indeep-notes.png');
     ev.dataTransfer.setDragImage(image, 0, 0);
   }
 
   handleDragEnd(ev): void {
     ev.target.style.opacity = '1';
-    if(!this.dropElement) {
+    if (!this.dropElement) {
       this.selection.clear();
     }
   }
 
   handleDragOver(ev): void {
     ev.preventDefault();
-    this.renderer.addClass(this.inputUpdate.nativeElement,'hovered' );
+    this.renderer.addClass(this.inputUpdate.nativeElement, 'hovered');
   }
 
   handleDragEnter(ev): void {
-    this.renderer.addClass(this.inputUpdate.nativeElement,'hovered' );
+    this.renderer.addClass(this.inputUpdate.nativeElement, 'hovered');
   }
 
   handleDragLeave(ev): void {
-    this.renderer.removeClass(this.inputUpdate.nativeElement,'hovered' );
+    this.renderer.removeClass(this.inputUpdate.nativeElement, 'hovered');
   }
 
   isAllSelected(): boolean {
@@ -240,7 +244,7 @@ export class TableComponent implements OnInit, OnDestroy {
         this.previousDocument = res;
         this.selection.select(res);
         this.selection.toggle(res);
-        return this.previousDocument = res;   
+        return this.previousDocument = res;
       });
   }
 
@@ -275,7 +279,7 @@ export class TableComponent implements OnInit, OnDestroy {
       Type: this.previousDocument.Type,
       CreateDate: this.previousDocument.CreateDate,
       ModifiedDate: this.previousDocument.ModifiedDate,
-      IsFavourite:this.previousDocument.IsFavourite
+      IsFavourite: this.previousDocument.IsFavourite
     };
     this.documentService.updateDocument(updDocument)
       .pipe(takeUntil(this.unsubscribe$))
@@ -308,7 +312,7 @@ export class TableComponent implements OnInit, OnDestroy {
   deleteDocuments(): void {
     if (this.selection.selected.length !== 0) {
       const array = this.getIdsArray();
-      const data = { title: 'Delete', message: `Are sure you want to delete ${array.length} document${array.length>1?'s':'' }?` };
+      const data = { title: 'Delete', message: `Are sure you want to delete ${array.length} document${array.length > 1 ? 's' : ''}?` };
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         width: '300px',
         data: data
