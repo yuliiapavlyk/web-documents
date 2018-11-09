@@ -6,4 +6,5 @@ export class Document {
     Type: string;
     CreateDate: Date;
     ModifiedDate: Date;
+    IsFavourite:boolean;
 }

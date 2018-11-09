@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material';
+import { Subject, Subscription } from 'rxjs';
 
 import { FavouriteDocumentService } from '../services/favourite-document.service';
 import { FavouriteDocument } from '../models/favouriteDocument';
+import { TransferService } from '../services/transfer.service';
+import { Document } from '../models/document';
 
 @Component({
   selector: 'app-favourite-document',
@@ -11,32 +14,39 @@ import { FavouriteDocument } from '../models/favouriteDocument';
 })
 export class FavouriteDocumentComponent implements OnInit {
   documents;
-  elements;
   idDocument: number;
   idUser: number;
+  document: Document;
   favouriteDoc: FavouriteDocument;
+  //data:boolean=false;
+  interval: Subscription;
   dataSource = new MatTableDataSource<Document[]>(this.documents);
   displayedColumns: string[] = ['Favourite', 'Name', 'Description', 'Author', 'CreateDate', 'ModifiedDate'];
+  destroy$: Subject<boolean> = new Subject<boolean>();
 
   constructor(private favouriteDocumentService: FavouriteDocumentService,
+    private transferService: TransferService
   ) { }
 
   deleteFromFavourite(idDocument: number, idRow: number, row) {
     let favouriteDoc = { UserId: 1, DocumentId: idDocument };
     this.favouriteDocumentService.deleteFromFavouriteDocuments(favouriteDoc as FavouriteDocument).subscribe(res => {
-      this.loadFavourites();
+      //  this.loadFavourites();
     });
   }
 
   loadFavourites(): void {
-    this.favouriteDocumentService.getFavouriteDocuments(1).subscribe(res => {
+    this.favouriteDocumentService.getFavouriteDocuments().subscribe(res => {
       this.documents = res;
       this.dataSource.data = this.documents;
     });
   }
 
   ngOnInit() {
-    this.loadFavourites();
+    this.documents = this.transferService.getFavourite();
+    this.dataSource.data = this.documents;
+
   }
+
 }
 

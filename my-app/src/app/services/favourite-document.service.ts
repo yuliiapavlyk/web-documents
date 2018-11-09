@@ -23,7 +23,7 @@ export class FavouriteDocumentService {
 
   private url = `${environment.apiUrl}favouriteDocument/`;
 
-  getFavouriteDocuments(idUser:number): Observable<Document[]> {
+  getFavouriteDocuments(): Observable<Document[]> {
     return this.http.get<Document[]>(this.url).pipe( 
        catchError(val => of(val)));
   }
@@ -45,3 +45,4 @@ export class FavouriteDocumentService {
     };
   }
 }
+
