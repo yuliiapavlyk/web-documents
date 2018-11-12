@@ -2,8 +2,7 @@ import { Component, OnInit, OnDestroy, Output, EventEmitter, Inject, ViewChild, 
 import { NgForm } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatSelect } from '@angular/material';
-import { MatSnackBar } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatSelect, MatSnackBar } from '@angular/material';
 
 import { DocumentService } from '../services/document.service';
 import { Document } from '../models/document';

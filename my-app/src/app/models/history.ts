@@ -1,7 +1,7 @@
 
 export class History {
-    Id:number;
-    SearchQuery:string;
-    UserId:number;
-    CreateDate:Date;
+    Id: number;
+    SearchQuery: string;
+    UserId: number;
+    CreateDate: Date;
 }

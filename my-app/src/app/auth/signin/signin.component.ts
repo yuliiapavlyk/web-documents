@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { MatSnackBar } from '@angular/material';
-import { AuthService } from '../../services/auth.service';
 import { Router, ActivatedRoute } from '@angular/router';
+import { MatSnackBar } from '@angular/material';
+
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-signin',
@@ -15,10 +16,10 @@ export class SigninComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private snackBar: MatSnackBar) {
-      if (this.authService.isLogined()) {
-        this.router.navigate(['/']);
-      }
-     }
+    if (this.authService.isLogined()) {
+      this.router.navigate(['/']);
+    }
+  }
 
   ngOnInit() {
   }

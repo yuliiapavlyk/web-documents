@@ -5,7 +5,7 @@ export class DocumentParams {
     pageNumber: number;
     pageSize: number;
 
-    constructor(criterion: string, direction: string, searchValue: string, pageNumber: number, pageSize: number ) {
+    constructor(criterion: string, direction: string, searchValue: string, pageNumber: number, pageSize: number) {
         this.criterion = criterion;
         this.direction = direction;
         this.searchValue = searchValue;

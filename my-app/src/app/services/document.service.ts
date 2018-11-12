@@ -29,11 +29,11 @@ export class DocumentService {
     return this.http.get<Document[]>(this.url).pipe(
       catchError(this.handleError<Document[]>(`getAllDocuments`)));
   }
-  getDocumentsByPage( docParams: DocumentParams): Observable<PagedListDocument> {
+  getDocumentsByPage(docParams: DocumentParams): Observable<PagedListDocument> {
     return this.http.post<PagedListDocument>(`${this.url}getDocuments/`, docParams, this.httpOptions).pipe(
       catchError(this.handleError<PagedListDocument>(`getDocumentsByPage`)));
   }
-  getDocumentsByPageWithSearch( docParams: DocumentParams): Observable<PagedListDocumentWithMessage> {
+  getDocumentsByPageWithSearch(docParams: DocumentParams): Observable<PagedListDocumentWithMessage> {
     return this.http.post<PagedListDocumentWithMessage>(`${this.url}search/`, docParams, this.httpOptions).pipe(
       catchError(this.handleError<PagedListDocumentWithMessage>(`getDocumentsByPage`)));
   }
@@ -43,8 +43,8 @@ export class DocumentService {
     );
   }
 
-  uploadDocument(file: FormData ): Observable<any> {
-    return this.http.post<any>(`${this.url}upload`, file , { observe: 'response' }).pipe(
+  uploadDocument(file: FormData): Observable<any> {
+    return this.http.post<any>(`${this.url}upload`, file, { observe: 'response' }).pipe(
       catchError(val => of(val)));
   }
 
@@ -53,8 +53,8 @@ export class DocumentService {
       catchError(val => of(val)));
   }
 
-  updateDocument( document: Document): Observable<HttpResponse<any>> {
-    return this.http.put(`${this.url}${document.Id}`,document, this.httpOptions).pipe(
+  updateDocument(document: Document): Observable<HttpResponse<any>> {
+    return this.http.put(`${this.url}${document.Id}`, document, this.httpOptions).pipe(
       catchError(r => of(r))
     );
   }
@@ -65,7 +65,7 @@ export class DocumentService {
     );
   }
   deleteDocuments(ids: number[]): Observable<any> {
-    return this.http.request<number[]>('delete', this.url, { body:ids} ).pipe(
+    return this.http.request<number[]>('delete', this.url, { body: ids }).pipe(
       catchError(this.handleError<any>('deleteDocuments'))
     );
   }
