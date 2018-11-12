@@ -5,15 +5,15 @@
 
     <!-- <button mat-button type="button" name="uploadbutton" class="for-upload" (click)="file.click()" color="primary">Add
       File</button> -->
-      <mat-form-field class="for-upload">
-        <mat-select placeholder="Add File" disableRipple (selectionChange)="setAccept($event)" >
-          <mat-option  class="fileInput" >None</mat-option>
-          <mat-option value=".txt">Text file..</mat-option>
-          <mat-option value=".doc">Microsoft Document 97-2003..</mat-option>
-          <mat-option value=".docx">Microsoft Document</mat-option>
-          <mat-option value=".pdf">PDF file..</mat-option>
-        </mat-select>
-      </mat-form-field>
+    <mat-form-field class="for-upload">
+      <mat-select placeholder="Add File" disableRipple (selectionChange)="setAccept($event)">
+        <mat-option class="fileInput">None</mat-option>
+        <mat-option value=".txt">Text file..</mat-option>
+        <mat-option value=".doc">Microsoft Document 97-2003..</mat-option>
+        <mat-option value=".docx">Microsoft Document</mat-option>
+        <mat-option value=".pdf">PDF file..</mat-option>
+      </mat-select>
+    </mat-form-field>
 
     <mat-form-field class="add-document-fileds">
       <input matInput placeholder="File " [(ngModel)]="name" name="nameFile" [disabled]="!addSuccessfully" [readonly]="true">
@@ -21,7 +21,7 @@
 
     <mat-form-field class="add-document-fileds">
       <textarea matInput placeholder="Description" maxlength="500" [(ngModel)]="description" name="descriptionFile"
-        required ></textarea>
+        required></textarea>
     </mat-form-field>
 
     <mat-form-field class="add-document-fileds">

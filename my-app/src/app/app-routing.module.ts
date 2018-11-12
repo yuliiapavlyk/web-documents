@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+
 import { SigninComponent } from './auth/signin/signin.component';
 import { TableComponent } from './table/table.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { AuthGuard } from './auth/auth.guard';
 import { NotAuthorizedComponent } from './not-authorized/not-authorized.component';
 import { FavouriteDocumentComponent } from '../app/favourite-document/favourite-document.component'
-import { from } from 'rxjs';
 import { GuestlayoutComponent } from './guestlayout/guestlayout.component';
 import { MainLayoutComponent } from './main-layout/main-layout.component';
 import { SignupComponent } from './auth/signup/signup.component';

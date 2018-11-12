@@ -1,22 +1,15 @@
-import { Component, OnInit, ViewChild, HostListener, OnDestroy, ElementRef, Output, EventEmitter, Input, Renderer2, ViewChildren, QueryList } from '@angular/core';
-import { SelectionModel } from '@angular/cdk/collections';
-import { MatTableDataSource, MatPaginator } from '@angular/material';
-import { MatDialog } from '@angular/material/dialog';
-import { Subject, fromEvent, Observable } from 'rxjs';
-import { takeUntil, startWith, map } from 'rxjs/operators';
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { PageEvent } from '@angular/material';
-import { Sort, MatTable } from '@angular/material';
+import { Component, OnInit, ViewChild, HostListener, OnDestroy, ElementRef, Output, EventEmitter, Input, Renderer2 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { MatSnackBar } from '@angular/material';
+import { SelectionModel } from '@angular/cdk/collections';
+import { Subject, fromEvent, Observable } from 'rxjs';
+import { takeUntil, startWith, map, debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
+import { MatTableDataSource, MatPaginator, Sort, MatTable, PageEvent, MatSnackBar, MatDialog, MatAutocompleteTrigger } from '@angular/material';
 
 import { Document } from '../models/document';
 import { DocumentParams } from '../models/documentsParams';
 import { PagedListDocument } from '../models/pagedListDocument';
 import { DocumentService } from '../services/document.service';
 import { TransferService } from '../services/transfer.service';
-
 import { FavouriteDocumentService } from '../services/favourite-document.service';
 import { FavouriteDocument } from '../models/favouriteDocument';
 import { HistoryService } from '../services/history.service';
@@ -33,8 +26,6 @@ export enum keyCode {
   styleUrls: ['./table.component.css']
 })
 export class TableComponent implements OnInit, OnDestroy {
-  //@ViewChildren("mytable") mytable: QueryList<ElementRef>;
-
   displayedColumns: string[] = ['Select', 'IsFavourite', 'Name', 'Description', 'Author', 'CreateDate', 'ModifiedDate'];
   myControl = new FormControl();
   filteredOptions: Observable<string[]>;
@@ -147,7 +138,6 @@ export class TableComponent implements OnInit, OnDestroy {
       document.IsFavourite = !document.IsFavourite;
     })
     this.transferService.addDocumentFromFavourite(document);
-    //this.transferService.currentData.subscribe();
   }
 
   deleteFromFavourite(favouriteDocument, document) {
