@@ -1,4 +1,4 @@
-<table mat-table [dataSource]="dataSource" #mytable>
+<table mat-table [dataSource]="dataSource " >
   <ng-container matColumnDef="Favourite">
     <th mat-header-cell *matHeaderCellDef> Favourite </th>
     <td mat-cell *matCellDef="let element"> <img class="img-responsive" src='assets/yellowStar.png' #mytable (click)="deleteFromFavourite(element.Id,id,row)"></td>

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject,Observable, of} from 'rxjs';
+import { Subject,Observable, of,BehaviorSubject} from 'rxjs';
 
 
 import { FavouriteDocumentService } from './favourite-document.service'
@@ -13,19 +13,27 @@ export class TransferService {
 
   constructor(
     private favouriteDocumentService: FavouriteDocumentService
-  ) { }
+  ) {
+    this.favouriteDocumentService.getFavouriteDocuments().subscribe(result => {
+      // this.loading$.next(result);
+       this.documents = result;
+     })        
+     console.log("server-call");   
+    
+   }
   documents: Document[] ;
-  loading: boolean = true;
+ // loading: boolean = true;
+  //data:Document[]=[];
 
-  public loading$ = new Subject<Document[]>();
-  documentInitializing = this.loading$.asObservable();
+  // public loading$ = new BehaviorSubject<Document[]>(this.data);
+  // documentInitializing = this.loading$.asObservable();
 
-  public documentStream$ = new Subject<Document>();
-  documentChanges = this.documentStream$.asObservable();
+  // public documentStream$ = new Subject<Document>();
+  // documentChanges = this.documentStream$.asObservable();
 
-  addToStream(document: Document): void {
-    this.documentStream$.next(document);
-  }
+  // addToStream(document: Document): void {
+  //   this.documentStream$.next(document);
+  // }
 
 
 
@@ -41,17 +49,17 @@ export class TransferService {
   getFavourite(): Observable<Document[]> {   
     
     if (!this.documents) {
+       
       this.favouriteDocumentService.getFavouriteDocuments().subscribe(result => {
-        this.loading$.next(result);
+       // this.loading$.next(result);
         this.documents = result;
-        return this.documents;
+        console.log("server-call");
       })
     }
-    else {
-      debugger
-      this.loading$.next(this.documents);
+    console.log("get data without server-call");    
+     // this.loading$.next(this.documents);
       return of(this.documents);
-    }
+    
   }
 }
 
