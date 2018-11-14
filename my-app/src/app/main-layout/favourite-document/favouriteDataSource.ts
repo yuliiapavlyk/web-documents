@@ -10,17 +10,18 @@ import { TransferService } from '../services/transfer.service';
 export class FavouriteDataSource extends DataSource<Document> {
 
     documents: Observable<Document[]>;
+    loading: boolean = false;
     constructor(private transferService: TransferService
     ) {
         super();
-
     }
 
-    connect(): Observable<Document[]> {
-        this.documents = this.transferService.getFavourite();
-        return this.documents;
-    }
+    connect(): Observable<Document[]> {        
+    this.documents = this.transferService.getFavourite();
+    return this.documents;
+    
 
+    }
 
     disconnect() { }
 }
