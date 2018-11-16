@@ -45,7 +45,7 @@ export class FavouriteDocumentComponent implements OnInit {
 
   ngOnInit() {
     this.dataSource = new FavouriteDataSource(this.transferService);
-  
+    this.dataSource.loadDocuments()
   }
 
 }
